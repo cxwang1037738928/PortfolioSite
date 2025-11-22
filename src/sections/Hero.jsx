@@ -47,9 +47,9 @@ const Hero = () => {
             </header>
             {/* RIGHT: 3D MODEL */}
             <figure>
-                <div className="hero-3d-layout border-red-200 border-2" 
+                <div className="hero-3d-layout" 
                 /* 70% width on large devices, full width on small devices */>
-                    <HeroExperience/>
+                    <HeroExperience />
                 </div>
             </figure>
         </div>
