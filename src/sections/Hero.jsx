@@ -1,6 +1,6 @@
 import React from 'react'
 import { words } from '../constants/index.js'
-
+import { Button } from '../components/Button.jsx'
 const Hero = () => {
   return (
     <section id="hero" className="relative overflow-hidden">
@@ -33,8 +33,17 @@ const Hero = () => {
                         <h2>Into Real Projects</h2>
                         <h3>That Deliver Results</h3>
                     </div>
+                    <p className="text-white-50 md:text-xl relative z-10 pointer-events-none">
+                        Hi, I'm Eric. A student studying Computer Science at the University of Toronto.
+                    </p>
+                    <Button
+                        className="md:w-80 md:h-16 w-60 h-12"
+                        id="button"
+                        text="See my Work"
+                    />
                 </div>
             </header>
+            
             {/* RIGHT: 3D MODEL */}
         </div>
     </section>
