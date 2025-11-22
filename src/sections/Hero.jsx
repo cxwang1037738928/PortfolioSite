@@ -1,6 +1,6 @@
 import React from 'react'
 import { words } from '../constants/index.js'
-import { Button } from '../components/Button.jsx'
+import Button from '../components/Button.jsx'
 const Hero = () => {
   return (
     <section id="hero" className="relative overflow-hidden">
@@ -43,7 +43,6 @@ const Hero = () => {
                     />
                 </div>
             </header>
-            
             {/* RIGHT: 3D MODEL */}
         </div>
     </section>
