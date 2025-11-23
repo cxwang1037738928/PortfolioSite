@@ -3,10 +3,27 @@ import React from 'react'
 const HeroLights = () => {
   return (
     <>
-        <ambientLight /* Lighting of the model */
-        intensity={0.2} color="#1a1a40"/>
-        <directionalLight /* can modify intensity of the light with intensity */
-        position={[5, 5, 5]} intensity={1}/>
+        <spotLight /* desk lamp */
+        position={[2, 5, 6]} /* Postion of the spotlight within mesh*/
+        angle={0.15}         /* Angle of the spotlight */
+        intensity={100}      /* Intensity of the spotlight */
+        penumbra={1}     /* Softness of the spotlight edge, highter = softer */
+        color="white"
+        />
+        <spotLight 
+        position={[4, 5, 4]} 
+        angle={0.3}     
+        intensity={40}    
+        penumbra={1}     
+        color="white"
+        />
+        <spotLight /* fill light */
+        position={[6, 6, 6]} 
+        angle={0.6}     
+        intensity={60}    
+        penumbra={1}     
+        color="white"
+        />             
     </>
   )
 }
