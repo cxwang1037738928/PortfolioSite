@@ -12,15 +12,18 @@ const HeroExperience = () => {
   return (
     <Canvas /* Three.js Canvas */
     camera={{ position: [0, 0, 15], fov: 45}} >
+
         <OrbitControls /* allows user to move around 3D model */    
         enablePan={false} /* disallow user from panning from the model */
         enableZoom={!isTablet} /* disallow zoom on tablet since it prevents scrolling */
         maxDistance={20} /* maximum distance the camera can zoom out */
         minDistance={5} /* min distance user can zoom in */
-        minpolarAngle={Math.PI / 5} /* Limit camera rotation to y plain */
-        maxpolarAngle={Math.PI / 2} /* Limit camera rotation to y plain */
+        minPolarAngle={Math.PI / 5} /* Limit camera rotation in y plain, larger = smaller area of movement*/
+        maxPolarAngle={Math.PI / 2} /* Limit camera rotation to y plain */
         />
+        
         <HeroLights /* lighting for the model */ />
+
         <group 
             scale={isMobile? 0.7 : 1} /* scales down model on mobile devices */
             position={[0, -3.5, 0]} /* moves model down on y axis */

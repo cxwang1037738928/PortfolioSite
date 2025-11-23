@@ -2,8 +2,28 @@ import React from 'react'
 import { words } from '../constants/index.js'
 import Button from '../components/Button.jsx'
 import HeroExperience from '../components/HeroModels/HeroExperience.jsx'
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import AnimatedCounter from '../components/AnimatedCounter.jsx';
 
 const Hero = () => {
+    /* Animates the text in hero section on screen load */
+    useGSAP(() => {
+        gsap.fromTo('.hero-text h1, .hero-text h2, .hero-text h3', 
+           {
+            y: 50, /* element's starting point in y axis */
+            opacity: 0 /* starting opacity of elements */
+           },
+           { 
+            y: 0, /* bring element down onto screen (y 0) */
+            opacity: 1,
+            stagger: 0.2,    /* staggers rotation of each element by 0.2 seconds*/
+            duration: 1, /* duration of the animation in seconds */
+            ease: 'power2.inOut' /* easing function for smooth animation */
+           } 
+        )
+
+    });
   return (
     <section id="hero" className="relative overflow-hidden">
         <div className="absolute top-0 left-0 z-10">
@@ -53,6 +73,7 @@ const Hero = () => {
                 </div>
             </figure>
         </div>
+        <AnimatedCounter />
     </section>
   )
 }

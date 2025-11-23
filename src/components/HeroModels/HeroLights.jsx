@@ -7,7 +7,7 @@ const HeroLights = () => {
         position={[2, 5, 6]} /* Postion of the spotlight within mesh*/
         angle={0.15}         /* Angle of the spotlight */
         intensity={100}      /* Intensity of the spotlight */
-        penumbra={1}     /* Softness of the spotlight edge, highter = softer */
+        penumbra={0.7}     /* Softness of the spotlight edge, highter = softer */
         color="white"
         />
         <spotLight 
@@ -18,7 +18,7 @@ const HeroLights = () => {
         color="white"
         />
         <spotLight /* fill light */
-        position={[6, 6, 6]} 
+        position={[4, 7, 4]} 
         angle={0.6}     
         intensity={60}    
         penumbra={1}     
