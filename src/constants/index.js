@@ -9,8 +9,8 @@ const navLinks = [
     link: "#work",
   },
   {
-    name: "Experience",
-    link: "#experience",
+    name: "About Me",
+    link: "#AboutMe",
   },
   {
     name: "Skills",
@@ -152,6 +152,8 @@ const techStackIcons = [
   },
 ];
 
+
+// Data for card section, used in ExperienceSection.jsx
 const expCards = [
   {
     review: "Adrian brought creativity and technical expertise to the team, significantly improving our frontend performance. His work has been invaluable in delivering faster experiences.",

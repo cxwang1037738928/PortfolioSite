@@ -73,7 +73,7 @@ const Hero = () => {
                 </div>
             </figure>
         </div>
-        <AnimatedCounter />
+        {/* <AnimatedCounter /> */}
     </section>
   )
 }

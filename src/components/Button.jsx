@@ -5,7 +5,7 @@ const Button = ({ text, className, id }) => {
     <a
     onClick={(e) => {
       e.preventDefault(); /* Prevents default anchor behavior (it reloads browser on click) */
-      const target = document.getElementById('counter') /* find the section with id counter */
+      const target = document.getElementById('work') /* find the section with id work */
 
       if(target && id) {
         /* Set offset of space at top of screen after scrolling to target */

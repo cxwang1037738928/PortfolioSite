@@ -1,10 +1,32 @@
 import React from 'react'
 import { navLinks } from '../constants'
+import { useEffect, useState } from 'react';
 
 const Navbar = () => {
+
+    const [scrolled, setScrolled] = useState(false);
+
+    /* Make it so nav bar gets a distinguishing background as user scrolls to other sections */
+
+    useEffect(
+        () => {
+        const handleScroll = () => {
+            const isScrolled = window.scrollY > 10;
+            setScrolled(isScrolled);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        
+        return () => window.removeEventListener('scroll', handleScroll);
+    
+    
+    },
+
+    [])
+
   return (
     <header
-    className="navbar"
+    className= {`navbar ${scrolled ? 'scrolled' : 'not-scrolled'}`}
     >
         <div
         className="inner"
