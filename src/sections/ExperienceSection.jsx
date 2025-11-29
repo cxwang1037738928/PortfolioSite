@@ -72,6 +72,7 @@ const Experience = () => {
         // Set the opacity of the text to 0
         opacity: 0,
         // Move the text from the left to its final position
+        
         // (xPercent: 0 means the text is at its final position)
         xPercent: 0,
         // Animate over 1 second
