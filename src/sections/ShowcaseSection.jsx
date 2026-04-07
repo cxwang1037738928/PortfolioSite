@@ -44,18 +44,19 @@ const ShowcaseSection = () => {
 
                     <div className="image-wrapper">
                         <img
-                        src="/images/project1.png"
+                        src="/images/Labrador.jpg"
                         alt="Ryde"
                         />
                     </div>
                     <div>
                         <h2>
-                            Project 1 description
+                            
                         </h2>
                         <p
                         className="text-white-50 md:text-xl"
                         >
-                        More about the description of Project 1 and tech stack used + obstacles encountered
+                        An app that allows users to label images and package them into containers of data for feeding into CV models. The app also features a dashboard for users to view and manage their datasets,
+                         as well as a hierarchy system for cashiers and managers to manage users and ensure quality control.
                         </p>
                     </div>
 
@@ -74,11 +75,11 @@ const ShowcaseSection = () => {
                         className="image-wrapper" // background color for project image
                         >
                             <img
-                            src="/images/project2.png"
+                            src="/images/Galaxy_Finder.png"
                             alt="Library Management"
                             />
                         </div>
-                        <h2>Project 2 title + description</h2>
+                        <h2>An application that uses the Ultralytics YOLO model to segment and identify galaxy types, trained on augmented data from the Galaxy Zoo project.</h2>
 
                     </div>
 
@@ -90,11 +91,11 @@ const ShowcaseSection = () => {
                         className="image-wrapper" // background color for project image
                         >
                             <img
-                            src="/images/project3.png"
+                            src="/images/Greyscale_AI.png"
                             alt="YC directory"
                             />
                         </div>
-                        <h2>Project 3 title + description</h2>
+                        <h2>A greyscale image colorization AI that I made as part of a course which uses two convolutional neural network architectures, PoolUpsampleNet and ConvTransposeNet, to predict pixel-wise colors from grayscale images</h2>
 
                     </div>
 
