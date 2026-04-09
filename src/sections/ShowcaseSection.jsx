@@ -43,10 +43,12 @@ const ShowcaseSection = () => {
                 <div className="first-project-wrapper" ref={project1Ref}>
 
                     <div className="image-wrapper">
-                        <img
-                        src="/images/Labrador.jpg"
-                        alt="Ryde"
-                        />
+                        <a href="https://github.com/cxwang1037738928/Labrador" target="_blank" rel="noopener noreferrer">
+                            <img
+                            src="/images/Labrador_fixed.png"
+                            alt="Ryde"
+                            />
+                        </a>
                     </div>
                     <div>
                         <h2>
@@ -74,10 +76,13 @@ const ShowcaseSection = () => {
                         <div
                         className="image-wrapper" // background color for project image
                         >
-                            <img
+                            <a href="https://github.com/cxwang1037738928/Galaxy-Identifier" target="_blank" rel="noopener noreferrer">
+                                <img
                             src="/images/Galaxy_Finder.png"
                             alt="Library Management"
                             />
+                            </a>
+                            
                         </div>
                         <h2>An application that uses the Ultralytics YOLO model to segment and identify galaxy types, trained on augmented data from the Galaxy Zoo project.</h2>
 
@@ -90,10 +95,12 @@ const ShowcaseSection = () => {
                         <div
                         className="image-wrapper" // background color for project image
                         >
-                            <img
-                            src="/images/Greyscale_AI.png"
-                            alt="YC directory"
-                            />
+                            <a href="https://github.com/cxwang1037738928/ImageColorizationAI" target="_blank" rel="noopener noreferrer">
+                                <img
+                                src="/images/Greyscale_AI.png"
+                                alt="YC directory"
+                                />
+                            </a>
                         </div>
                         <h2>A greyscale image colorization AI that I made as part of a course which uses two convolutional neural network architectures, PoolUpsampleNet and ConvTransposeNet, to predict pixel-wise colors from grayscale images</h2>
 

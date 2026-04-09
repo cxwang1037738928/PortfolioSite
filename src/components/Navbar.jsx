@@ -59,7 +59,7 @@ const Navbar = () => {
 
             </nav>
             <a
-            href="#contact" className="contact-btn group"
+            href="https://www.linkedin.com/in/chuxuan-wang-477539242/" className="contact-btn group"  target="_blank" rel="noopener noreferrer"
             >
                 <div
                 className="inner"

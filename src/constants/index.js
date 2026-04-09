@@ -266,6 +266,36 @@ const socialImgs = [
   },
 ];
 
+const skills = [
+  // Languages
+  { name: "JavaScript", level: 3, category: "language" },
+  { name: "Python", level: 3, category: "language" },
+  { name: "Java", level: 2, category: "language" },
+  { name: "SQL", level: 2, category: "language" },
+  { name: "HTML", level: 2, category: "language" },
+  { name: "CSS", level: 2, category: "language" },
+  { name: "C", level: 1, category: "language" },
+  { name: "R", level: 1, category: "language" },
+  { name: "Assembly", level: 1, category: "language" },
+
+  // Developer Tools
+  { name: "Git", level: 3, category: "tool" },
+  { name: "Jupyter Notebook", level: 3, category: "tool" },
+  { name: "VS Code", level: 3, category: "tool" },
+
+  // Libraries / DB
+  { name: "PyTorch", level: 3, category: "library" },
+  { name: "MySQL", level: 2, category: "library" },
+  { name: "PostgreSQL", level: 2, category: "library" },
+  { name: "Scikit-learn", level: 2, category: "library" },
+  { name: "TensorFlow", level: 2, category: "library" },
+
+  // Frameworks
+  { name: "React", level: 2, category: "framework" },
+  { name: "React Native", level: 1, category: "framework" },
+  { name: "JavaFX", level: 1, category: "framework" },
+];
+
 export {
   words,
   abilities,
@@ -278,4 +308,5 @@ export {
   techStackIcons,
   techStackImgs,
   navLinks,
+  skills,
 };
