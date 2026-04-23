@@ -56,7 +56,8 @@ const Hero = () => {
                         <h3>That Deliver Results</h3>
                     </div>
                     <p className="text-white-50 md:text-xl relative z-10 pointer-events-none">
-                        Hi, I'm Eric. A student studying Computer Science at the University of Toronto.
+                        Hi, I'm Eric, a fourth year Computer Science student at the University of Toronto.
+
                     </p>
                     <Button
                         className="md:w-80 md:h-16 w-60 h-12"
