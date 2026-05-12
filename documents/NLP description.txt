@@ -1,0 +1,37 @@
+Project:
+Neutral Machine Translation Model
+
+Overview:
+Character-level neural machine translation system that translates English words to Pig Latin using a transformer-based encoder-decoder architecture. The model operates at individual character granularity rather than word level, requiring the attention mechanisms to align character-by-character transformations. Core task: learn linguistic transformation rules through supervised learning on parallel English-Pig Latin word pairs.
+
+Tech Stack:
+
+PyTorch (deep learning framework)
+Python
+CUDA (GPU acceleration)
+NumPy, Matplotlib, Pandas, Seaborn (data visualization and utilities)
+Architecture:
+Stacked multi-layer transformer with two distinct components:
+
+TransformerEncoder: Self-attention over input characters, scaled dot-product attention, sine/cosine positional encodings (Vaswani et al.), residual connections, feed-forward MLPs per layer
+TransformerDecoder: Causal self-attention (prevents attending to future tokens), cross-attention over encoder annotations, identical positional encoding scheme, multi-layer stacking with residual pathways
+Embedding layer: Character-to-dense-vector transformation
+Output layer: Linear projection to vocabulary logits, softmax for token probabilities
+Special tokens: SOS (start), EOS (end), EOP (end of prompt)
+Challenges:
+
+Character-level sequence generation requires precise positional attention; single misaligned character breaks output validity
+Causal masking in decoder prevents attending beyond current position, limiting context for generating subsequent characters
+Batch bucketing by (source_length, target_length) pairs adds preprocessing complexity; sparse buckets waste computation
+Positional encoding design must scale to variable-length inputs (max_seq_len=1000)
+Model must implicitly learn Pig Latin rules (vowel movements, consonant clusters) from data without explicit rules
+Outcomes:
+
+Multiple trained variants with configurable hyperparameters (hidden_size: 32/64, num_layers: 3/4, batch_size: 64/512)
+Training curves tracked per-epoch on small and large datasets (pig_latin_small.txt, pig_latin_large.txt)
+Validation loss monitoring with early stopping (patience configurable)
+Qualitative translation outputs per epoch on test sentence ("the air conditioning is working")
+Attention weight visualization per decoder layer showing alignment between input and output characters
+Checkpoint saving of best models (encoder, decoder, vocabulary mappings)
+Keywords:
+transformer, encoder-decoder, scaled-dot-product-attention, causal-attention, self-attention, cross-attention, positional-encodings, character-level-seq2seq, residual-connections, multi-layer-stacking, batch-bucketing, cross-entropy-loss, adam-optimizer, learning-rate-decay, early-stopping, character-embedding, feed-forward-networks, attention-visualization, token-classification

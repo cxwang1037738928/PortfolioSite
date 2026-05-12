@@ -1,0 +1,30 @@
+Project:
+A Python command-line checkers move generator and minimax game solver that reads an 8x8 board from a file, runs adversarial search, and writes successive board states to an output file.
+
+Overview:
+Implements a simplified American checkers engine with board state modeling, move generation, mandatory jump handling, piece promotion, and alpha-beta minimax search. The engine alternates turns between red and black pieces until one side has no legal pieces remaining.
+
+Tech Stack:
+
+Python 3
+Standard library only: argparse, copy, sys, time
+Architecture:
+
+Board class stores an 8x8 matrix of chars and provides display semantics.
+State encapsulates current board, turn, and search depth.
+Move generation includes normal diagonal moves, forced captures, multi-jump chaining, and king movement rules.
+alpha_beta_search coordinates adversarial search using max_value/min_value with alpha-beta pruning.
+Static evaluation combines piece values, center control, mobility, safety, positional advantage, distance penalties, and chain-jump potential.
+Challenges:
+
+Handling exponential branching from jumps and move generation in checkers.
+Representing recursive multi-jump capture sequences correctly.
+Designing a heuristic evaluation function that balances material, positional control, promotion threats, and capture potential.
+Performance constraints from repeated copy.deepcopy of board matrices and Python recursion at search depth.
+Outcomes:
+
+Works as a self-contained solver for input-driven checkers board states.
+Uses depth-limited alpha-beta pruning at fixed depth_limit = 7.
+Produces deterministic move sequences in an output file without networking or external services.
+Keywords:
+checkers, minimax, alpha-beta pruning, game tree search, board evaluation, heuristic, forced capture, jump chaining, king promotion, 8x8 grid, Python command-line, file input/output, state space exploration, adversarial AI.

@@ -1,9 +1,15 @@
-import { useState } from "react";
+// src/components/ChatbotModels/ChatbotWidget.jsx
+
+import { useEffect, useState } from "react";
+
+import { embedQuery } from "../../../lib/embedQuery.js";
+import { searchDocuments } from "../../../lib/search.js";
 
 export default function ChatbotWidget() {
 
-  const [open, setOpen] = useState(false); // manages whether the chat window is open or closed
-  const [messages, setMessages] = useState([ // starting mnessage from the assistant
+  const [open, setOpen] = useState(false);
+
+  const [messages, setMessages] = useState([
     {
       role: "assistant",
       content: "Hi! Ask me anything about my projects.",
@@ -13,32 +19,112 @@ export default function ChatbotWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // stores embedded document chunks
+  const [documents, setDocuments] = useState([]);
+
+  // load embedded documents once
+  useEffect(() => {
+
+    async function loadDocuments() {
+
+      try {
+
+        const docsResponse = await fetch("/documents.json");
+
+        const docs = await docsResponse.json();
+
+        setDocuments(docs);
+
+      } catch (err) {
+
+        console.error("Failed to load documents.json", err);
+      }
+    }
+
+    loadDocuments();
+
+  }, []);
+
   async function sendMessage() {
+
     if (!input.trim()) return;
 
-    /* set the user's message to have the user role */
+  //   // don't try to answer questions if documents aren't loaded yet, since we won't have any context to provide to the backend
+  //   if (!documents.length) {
+
+  //   setMessages((prev) => [
+  //     ...prev,
+  //     {
+  //       role: "assistant",
+  //       content:
+  //         "Documents are still loading. Please wait a moment.",
+  //     },
+  //   ]);
+
+  //   return;
+  // }
+
     const userMessage = {
       role: "user",
       content: input,
     };
 
-    /* chat log of all messages, display only, will not be sent to the API */
     setMessages((prev) => [...prev, userMessage]);
 
     const currentInput = input;
+
     setInput("");
+
     setLoading(true);
 
     try {
+
+      // 1. embed the user query live in browser
+      console.log("1. started embedding");
+
+      const queryEmbedding = await embedQuery(currentInput);
+
+      // 2. retrieve top K most relevant chunks
+      console.log("2. started searching");
+
+      const topChunks = searchDocuments(
+        queryEmbedding,
+        documents,
+        5
+      );
+
+      // 3. combine retrieved context into one string
+      console.log("3. combining context");
+
+      const context = topChunks
+        .map((doc) => doc.text)
+        .join("\n\n");
+
+      // 4. send user question + retrieved context
+      console.log("4. sending to backend with context:");
+
       const response = await fetch("/api/chat", {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
-          message: currentInput, /* only send input, not the whole chat log */
+          message: currentInput,
+          context,
         }),
       });
+
+      console.log("Received response from backend");
+      
+      // buffer if response is not ok to get error message from backend
+      if (!response.ok) {
+
+        const text = await response.text();
+
+        throw new Error(text);
+      }
 
       const data = await response.json();
 
@@ -49,7 +135,11 @@ export default function ChatbotWidget() {
           content: data.reply,
         },
       ]);
+
     } catch (err) {
+
+      console.error(err);
+
       setMessages((prev) => [
         ...prev,
         {
@@ -58,7 +148,7 @@ export default function ChatbotWidget() {
         },
       ]);
     }
-    /* sets to false after the fetch is complete */
+
     setLoading(false);
   }
 
@@ -136,14 +226,17 @@ export default function ChatbotWidget() {
                     msg.role === "user"
                       ? "flex-end"
                       : "flex-start",
+
                   background:
                     msg.role === "user"
                       ? "#6d5dfc"
                       : "#f1f1f1",
+
                   color:
                     msg.role === "user"
                       ? "white"
                       : "black",
+
                   padding: "12px 14px",
                   borderRadius: "14px",
                   maxWidth: "80%",
@@ -177,29 +270,34 @@ export default function ChatbotWidget() {
               borderTop: "1px solid #eee",
             }}
           >
-                <input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Ask about my projects..."
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                        sendMessage();
-                        }
-                    }}
-                    style={{
-                        flex: 1,
-                        padding: "12px",
-                        borderRadius: "10px",
-                        border: "1px solid #d1d5db",
-                        outline: "none",
-                        backgroundColor: "white",
-                        color: "black",
-                        fontSize: "14px",
-                    }}
-                />
+            <input
+              value={input}
+
+              onChange={(e) => setInput(e.target.value)}
+
+              placeholder="Ask about my projects..."
+
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  sendMessage();
+                }
+              }}
+
+              style={{
+                flex: 1,
+                padding: "12px",
+                borderRadius: "10px",
+                border: "1px solid #d1d5db",
+                outline: "none",
+                backgroundColor: "white",
+                color: "black",
+                fontSize: "14px",
+              }}
+            />
 
             <button
               onClick={sendMessage}
+              disabled={loading}
               style={{
                 border: "none",
                 background: "#6d5dfc",
@@ -207,6 +305,7 @@ export default function ChatbotWidget() {
                 borderRadius: "10px",
                 padding: "0 16px",
                 cursor: "pointer",
+                opacity: loading ? 0.7 : 1,
               }}
             >
               Send

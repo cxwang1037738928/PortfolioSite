@@ -9,9 +9,10 @@ import { pipeline } from '@xenova/transformers';
 const DOCS_DIR = './documents';
 const OUTPUT_FILE = './public/documents.json';
 
-const CHUNK_SIZE = 800;
+const CHUNK_SIZE = 500;
 const CHUNK_OVERLAP = 100;
 
+// chunks text into overlapping pieces to create more context for the embedding model
 function chunkText(text, chunkSize = 800, overlap = 100) {
 
   const chunks = [];
@@ -30,6 +31,8 @@ function chunkText(text, chunkSize = 800, overlap = 100) {
   return chunks;
 }
 
+// truncate embedding values to reduce file size while keeping most of the information
+
 function truncateEmbedding(arr, precision = 5) {
 
   return Array.from(arr).map(v =>
@@ -46,7 +49,7 @@ async function main() {
     'Xenova/all-MiniLM-L6-v2'
   );
 
-  const files = fs.readdirSync(DOCS_DIR);
+  const files = fs.readdirSync(DOCS_DIR); // take every file in the documents directory, will ignore subdirectories for simplicity
 
   const documents = [];
 
@@ -77,7 +80,7 @@ async function main() {
 
       const output = await extractor(chunk, {
         pooling: 'mean',
-        normalize: true,
+        normalize: true, // normalize output so only need to perform dot product
       });
 
       const embedding = truncateEmbedding(

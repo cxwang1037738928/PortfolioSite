@@ -1,0 +1,38 @@
+Project:
+Labrador is an image labeling and dataset packaging platform with a React Native/Expo mobile frontend and an Express/Prisma backend for uploading, annotating, verifying, and exporting image data.
+
+Overview:
+
+Users upload images from a mobile app, create bounding-box annotations, and submit images for verification.
+Role-based access controls separate normal users from cashier/manager/admin users for verification and dataset management.
+The backend stores images, annotations, verifications, organizations, and user validity metadata.
+The current ML verification path is stubbed as a placeholder and can be replaced with a real model.
+Tech Stack:
+
+Backend: Node.js, Express 5, Prisma ORM, JWT auth, multer file upload, bcrypt, cors, dotenv.
+Database: Prisma schema targets PostgreSQL via DATABASE_URL but package includes sqlite3, suggesting local dev with SQLite and deployment config with Postgres.
+Frontend/mobile: Expo, React Native, React Navigation, Axios.
+Storage: local filesystem uploads under backend/uploads/images/; comments indicate planned migration to Firebase/S3.
+Authentication/authorization: JSON Web Tokens, role middleware, active user checks.
+Architecture:
+
+Mobile app calls REST API endpoints under /auth, /user, /organization, /image.
+/image routes include upload, user image query, cashier-only pending/all image lists, annotation CRUD, verification, and ML verification.
+Prisma models define User, Profile, Organization, Image, Annotation, ImageVerification, Dataset, PointsTransaction.
+Image records cascade-delete annotations/verifications; organization relationship can set null on delete.
+Express serves uploaded media statically under /uploads.
+Challenges:
+
+Managing image upload integrity with multipart file handling and validation via multer.
+Enforcing role-based permissions across a mixed user/verification workflow.
+Keeping annotation and verification data consistent when images are deleted.
+Supporting both per-user and organization-scoped images while preserving access control.
+Designing dataset export support for CV formats like COCO/YOLO/Pascal VOC without current implementation.
+Outcomes:
+
+Provides a complete labeled-image ingestion pipeline with structured metadata for computer vision training.
+Implements a verification workflow that updates image approval state and calculates user validity percentage.
+Enables cashier/manager roles to review pending images and validate annotations before dataset packaging.
+Lays groundwork for ML-assisted verification and future scalable storage/back-end migration.
+Keywords:
+image labeling, annotation, bounding box, CV dataset, Prisma ORM, Express REST API, JWT authentication, role-based access control, multer upload, image verification, dataset export, Expo React Native, PostgreSQL/SQLite, local file storage, user validity percentage, machine learning verification, verification pipeline, mobile app, annotations CRUD.
