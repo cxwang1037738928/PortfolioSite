@@ -8,6 +8,7 @@ import { searchDocuments } from "../../../lib/search.js";
 export default function ChatbotWidget() {
 
   const [open, setOpen] = useState(false);
+  const [lastMessageTime, setLastMessageTime] = useState(0);
 
   const [messages, setMessages] = useState([
     {
@@ -48,6 +49,14 @@ export default function ChatbotWidget() {
   async function sendMessage() {
 
     if (!input.trim()) return;
+    const now = new Date();
+    if (now - lastMessageTime < 1000) {
+      return;
+    }
+    setLastMessageTime(now);
+
+
+      // prevent spamming messages  
 
   //   // don't try to answer questions if documents aren't loaded yet, since we won't have any context to provide to the backend
   //   if (!documents.length) {
@@ -111,8 +120,12 @@ export default function ChatbotWidget() {
         },
 
         body: JSON.stringify({
-          message: currentInput,
-          context,
+          conversation: [
+            ...messages, // entire conversation history for better context, not just latest question
+            { role: "user", content: currentInput },
+            ],
+          context, // optional
+          prompt: "You are a RAG assistant for a personal website. Answer using ONLY the provided context chunks and conversation history. Do not use outside knowledge or guess. If the answer is not explicitly supported, say: “Not enough information in the provided context.” Treat chunks as partial but authoritative; combine them when relevant. Prefer the most specific and recent chunk if conflicts exist. Be concise and direct: answer first, then minimal supporting detail. If the query is ambiguous, ask one short clarification question or give up to two interpretations. Never fabricate projects, facts, or metrics. Keep responses brief and factual. Limit responses to a maximum of 200 words.", // set prompt here or leave it to backend
         }),
       });
 
