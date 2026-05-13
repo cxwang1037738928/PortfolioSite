@@ -7,13 +7,14 @@ import { searchDocuments } from "../../../lib/search.js";
 
 export default function ChatbotWidget() {
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); 
+  
   const [lastMessageTime, setLastMessageTime] = useState(0);
 
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content: "Hi! Ask me anything about my projects.",
+      content: "Hi, I'm Eric bot! Ask me anything about my projects. Note that responses may take up to ~10 seconds since I embed the user query and perform retrival in the browser instead of a dedicated backend server.",
     },
   ]);
 
@@ -22,6 +23,15 @@ export default function ChatbotWidget() {
 
   // stores embedded document chunks
   const [documents, setDocuments] = useState([]);
+
+  // open chatbot 1.5 seconds after page load
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setOpen(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // load embedded documents once
   useEffect(() => {
@@ -125,7 +135,7 @@ export default function ChatbotWidget() {
             { role: "user", content: currentInput },
             ],
           context, // optional
-          prompt: "You are a RAG assistant for a personal website. Answer using ONLY the provided context chunks and conversation history. Do not use outside knowledge or guess. If the answer is not explicitly supported, say: “Not enough information in the provided context.” Treat chunks as partial but authoritative; combine them when relevant. Prefer the most specific and recent chunk if conflicts exist. Be concise and direct: answer first, then minimal supporting detail. If the query is ambiguous, ask one short clarification question or give up to two interpretations. Never fabricate projects, facts, or metrics. Keep responses brief and factual. Limit responses to a maximum of 200 words.", // set prompt here or leave it to backend
+          prompt: "You are a RAG assistant for the personal website of a fourth year CS major at the University of Toronto. Be enthusiastic and use ONLY the provided context chunks and conversation history. Do not use outside knowledge or guess. If the answer is not explicitly supported, say: “Not enough information in the provided context.” Treat chunks as partial but authoritative; combine them when relevant. Prefer the most specific and recent chunk if conflicts exist. Be concise and direct: answer first, then minimal supporting detail. If the query is ambiguous, ask one short clarification question or give up to two interpretations. Never fabricate projects, facts, or metrics. Keep responses brief and factual. Limit responses to a maximum of 200 words, and try to structure responses as bullet points.", // set prompt here or leave it to backend
         }),
       });
 
@@ -212,12 +222,39 @@ export default function ChatbotWidget() {
             style={{
               background: "#6d5dfc",
               color: "white",
-              padding: "16px",
+              padding: "12px 16px",
               fontWeight: "bold",
               fontSize: "18px",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              borderTopLeftRadius: "16px",
+              borderTopRightRadius: "16px",
             }}
           >
-            AI Assistant
+            <div
+              style={{
+                width: "40px",
+                height: "40px",
+                borderRadius: "50%",
+                overflow: "hidden",
+                border: "2px solid white", // optional nice effect
+                flexShrink: 0,
+              }}
+            >
+              <img
+                src="/images/BotPicture.jpg"
+                alt="Eric Bot"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+            </div>
+
+            <span>Eric bot</span>
           </div>
 
           {/* Messages */}
