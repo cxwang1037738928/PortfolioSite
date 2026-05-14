@@ -1,55 +1,73 @@
-Project: A client-heavy semantic search + RAG (retrieval-augmented generation)
-prototype for a React portfolio site. Frontend currently generates queries and
-uses a mocked backend API (api/chat.js) while in-browser query-embedding logic and
-Openroute API integration are being implemented.
+# Project
 
-Overview: User text is embedded (planned in-browser), nearest-neighbor retrieval
-returns top documents/snippets from a precomputed vector index, and a backend
-composes contextual prompts for an LLM to produce final answers. Mock API stands
-in for the retrieval/LLM integration during development.
+Labrador is a client-heavy semantic search and RAG prototype for a React portfolio website. The frontend generates user queries and sends them to a mocked backend API (api/chat.js). In-browser embedding logic and OpenRouter API integration are being developed.
 
-Tech Stack:
+---
 
- - Frontend: React (Vite), client-side JS for embedding
- - Backend: Node serverless/API route (api/chat.js) placeholder
- - Embeddings: client-side model (WebAssembly/ONNX or remote embeddings)
- - LLM: OpenAI mini 5.4
- - Infra: serverless hosting Vercel
+## Overview
 
-Architecture:
+User queries are embedded (planned in-browser) and used for nearest-neighbor retrieval over a precomputed vector index. The backend composes contextual prompts for an LLM to generate final answers. During development, a mock API simulates retrieval and LLM orchestration.
 
- - In-browser: tokenize & embed query → send vector (or raw query) to backend
- - Backend: vector DB lookup (ANN) → retrieve top-k chunks with metadata → filter → assemble prompt/context → call LLM → return answer +
- provenance
- - Indexing pipeline: document chunking, embedding, metadata store, periodic 
-reindexing
+---
 
-Important technical decisions:
+## Tech Stack
 
- - Embedding location: browser (privacy & latency) vs server (consistency, smaller
- client binary)
- - Index type: ANN (HNSW/IVF+PQ) for low-latency at scale
- - Hybrid retrieval: lexical (BM25) + dense vectors to improve precision
- - Context window management and chunk-size tradeoffs to avoid prompt overrun
- - Provenance: attach source ids + offsets for traceability
+Frontend uses React (Vite) with client-side JavaScript for embedding.
 
-Challenges:
+The backend is a Node.js serverless API route (api/chat.js placeholder).
 
- - Client resource limits (CPU, memory) and model size for in-browser embeddings
- - Secure storage/use of API keys in client vs serverless
- - Index freshness and incremental updates for mutable content
- - Handling near-duplicate chunks and long documents (chunking + overlap)
- - Cost/latency of LLM calls; batching and caching top-k responses
- - Evaluation: building relevance labels and offline metrics
+Embeddings are generated using a client-side model (WebAssembly/ONNX or remote embedding API).
 
+The LLM layer uses OpenAI mini 5.4.
 
-Outcomes:
+Infrastructure is deployed on Vercel using serverless hosting.
 
- - Provides semantic recall where lexical search misses paraphrases and synonyms
- - Expected measurable goals: higher recall@k and MRR for intent-based queries, 
-reduced mean time-to-answer versus keyword search, controlled LLM call volume via 
-retrieved-context filtering and reranking
- - Traceability via source-level provenance enables auditing and user-facing 
-citations
+---
 
+## Architecture
 
+In-browser processing tokenizes and embeds queries before sending vectors (or raw queries) to the backend.
+
+The backend performs vector database lookup using approximate nearest neighbor (ANN) search, retrieves top-k chunks, filters results, and assembles a prompt context for the LLM.
+
+The indexing pipeline includes document chunking, embedding generation, metadata storage, and periodic reindexing.
+
+---
+
+## Important Technical Decisions
+
+Embedding can be performed in-browser for privacy and latency or on the server for consistency and reduced client complexity.
+
+The system uses ANN indexing (HNSW or IVF+PQ) for scalable low-latency retrieval.
+
+A hybrid retrieval approach combines lexical search (BM25) with dense vector search to improve precision.
+
+Context window management and chunk sizing are optimized to prevent prompt overflow.
+
+Each retrieval result includes provenance metadata such as source IDs and offsets for traceability.
+
+---
+
+## Challenges
+
+Client-side constraints such as CPU usage, memory limits, and model size impact in-browser embedding performance.
+
+API key security must balance between client exposure and serverless execution.
+
+Index freshness requires strategies for incremental updates as documents change.
+
+Long documents and near-duplicate chunks require careful chunking and overlap tuning.
+
+LLM cost and latency require batching, caching, and strict context filtering.
+
+Evaluation requires building relevance labels and measuring retrieval quality using metrics like recall@k and MRR.
+
+---
+
+## Outcomes
+
+The system improves semantic recall compared to keyword search by capturing paraphrases and intent-based queries.
+
+Expected improvements include higher recall@k, improved MRR, and reduced time-to-answer.
+
+Retrieval provenance enables explainability and supports user-facing citations and auditing.

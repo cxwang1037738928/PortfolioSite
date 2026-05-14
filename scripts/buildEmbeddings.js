@@ -1,109 +1,151 @@
 // scripts/buildEmbeddings.js
 
-// static build script to create document embeddings for all files in the documents directory
+import fs from "fs";
+import path from "path";
+import crypto from "crypto";
+import { pipeline } from "@xenova/transformers";
 
-import fs from 'fs';
-import path from 'path';
-import crypto from 'crypto';
+const DOCS_DIR = "./documents";
+const OUTPUT_FILE = "./public/documents.json";
 
-import { pipeline } from '@xenova/transformers';
+const MAX_CHARS = 500; // max characters per chunk, adjust as needed
 
-const DOCS_DIR = './documents';
-const OUTPUT_FILE = './public/documents.json';
+/* -----------------------------
+   CLEANING
+----------------------------- */
 
-const CHUNK_SIZE = 500;
-const CHUNK_OVERLAP = 100;
+function cleanText(text) {
+  return text
+    // remove obvious keyword sections if present
+    .replace(/keywords?:[\s\S]*$/im, "")
+    // normalize whitespace
+    .replace(/\r/g, "")
+    .trim();
+}
 
-// chunks text into overlapping pieces to create more context for the embedding model
-function chunkText(text, chunkSize = 800, overlap = 100) {
+/* -----------------------------
+   CHUNKING (HYBRID)
+----------------------------- */
+
+// detect structure (markdown or fallback)
+function detectSections(text) {
+  if (text.includes("\n## ")) {
+    return text.split(/\n##\s+/);
+  }
+
+  return text.split(/\n\s*\n/);
+}
+
+// normalize chunk
+function normalize(chunk) {
+  return chunk.trim().replace(/\s+/g, " ");
+}
+
+// sentence fallback splitter
+function splitBySentences(text, maxChars = MAX_CHARS) {
+  const sentences = text.split(/(?<=[.!?])\s+/);
+
+  const chunks = [];
+  let current = "";
+
+  for (const s of sentences) {
+    if (current.length + s.length > maxChars) {
+      if (current) chunks.push(current.trim());
+      current = s;
+    } else {
+      current += " " + s;
+    }
+  }
+
+  if (current) chunks.push(current.trim());
+
+  return chunks;
+}
+
+// enforce size limit
+function enforceSize(chunk, maxChars = MAX_CHARS) {
+  if (chunk.length <= maxChars) return [chunk];
+  return splitBySentences(chunk, maxChars);
+}
+
+// main chunker
+function chunkText(text) {
+  const sections = detectSections(text);
 
   const chunks = [];
 
-  let start = 0;
+  for (const section of sections) {
+    const cleaned = normalize(section);
 
-  while (start < text.length) {
+    if (!cleaned) continue;
 
-    const end = start + chunkSize;
+    const split = enforceSize(cleaned);
 
-    chunks.push(text.slice(start, end));
-
-    start += chunkSize - overlap;
+    chunks.push(...split);
   }
 
   return chunks;
 }
 
-// truncate embedding values to reduce file size while keeping most of the information
+/* -----------------------------
+   EMBEDDING UTILS
+----------------------------- */
 
+// rounds down all embedding to a certain decimal
 function truncateEmbedding(arr, precision = 5) {
-
-  return Array.from(arr).map(v =>
+  return Array.from(arr).map((v) =>
     Number(v.toFixed(precision))
   );
 }
 
-async function main() {
+/* -----------------------------
+   MAIN PIPELINE
+----------------------------- */
 
-  console.log('Loading embedding model...');
+async function main() {
+  console.log("Loading embedding model...");
 
   const extractor = await pipeline(
-    'feature-extraction',
-    'Xenova/all-MiniLM-L6-v2'
+    "feature-extraction",
+    "Xenova/all-MiniLM-L6-v2"
   );
 
-  const files = fs.readdirSync(DOCS_DIR); // take every file in the documents directory, will ignore subdirectories for simplicity
+  const files = fs.readdirSync(DOCS_DIR);
 
   const documents = [];
 
   for (const file of files) {
-
     const filePath = path.join(DOCS_DIR, file);
 
-    const stat = fs.statSync(filePath);
-
-    if (!stat.isFile()) continue;
+    if (!fs.statSync(filePath).isFile()) continue;
 
     console.log(`Processing ${file}...`);
 
-    const content = fs.readFileSync(
-      filePath,
-      'utf-8'
-    );
+    const raw = fs.readFileSync(filePath, "utf-8");
 
-    const chunks = chunkText(
-      content,
-      CHUNK_SIZE,
-      CHUNK_OVERLAP
-    );
+    const cleaned = cleanText(raw);
+
+    const chunks = chunkText(cleaned);
 
     for (let i = 0; i < chunks.length; i++) {
-
       const chunk = chunks[i];
 
       const output = await extractor(chunk, {
-        pooling: 'mean',
-        normalize: true, // normalize output so only need to perform dot product
+        pooling: "mean",
+        normalize: true,
       });
-
-      const embedding = truncateEmbedding(
-        output.data
-      );
 
       documents.push({
         id: crypto.randomUUID(),
-
         source: file,
-
         chunkIndex: i,
-
         text: chunk,
 
-        embedding,
+        embedding: truncateEmbedding(output.data),
 
         metadata: {
-          title: file.replace(/\.[^/.]+$/, ''),
+          title: file.replace(/\.[^/.]+$/, ""),
           length: chunk.length,
-          createdAt: new Date().toISOString(),
         },
       });
     }
@@ -111,12 +153,10 @@ async function main() {
 
   fs.writeFileSync(
     OUTPUT_FILE,
-    JSON.stringify(documents)
+    JSON.stringify(documents, null, 2)
   );
 
-  console.log(
-    `Saved ${documents.length} chunks`
-  );
+  console.log(`Saved ${documents.length} chunks`);
 }
 
 main();

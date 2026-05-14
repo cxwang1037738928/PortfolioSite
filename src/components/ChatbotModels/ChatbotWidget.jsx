@@ -107,6 +107,7 @@ export default function ChatbotWidget() {
       console.log("2. started searching");
 
       const topChunks = searchDocuments(
+        currentInput,
         queryEmbedding,
         documents,
         5

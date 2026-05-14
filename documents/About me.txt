@@ -1,64 +1,37 @@
 ABOUT ME 
 Identity
-
 I am a fourth-year Computer Science student at the University of Toronto (UofT), enrolled in the Computer Science Specialist program with a specialization in Artificial Intelligence (AI). My academic focus includes machine learning, systems, algorithms, and software engineering.
-
 I have completed 18.5 credits and plan to continue into a fifth year starting September, with an expected graduation date of June 2027. This timeline may be extended depending on internship opportunities.
-
 I have completed more than 10 Computer Science courses, including 8 upper-year CS courses covering systems, theory, artificial intelligence, databases, and software engineering.
 
 Computer Science Coursework
 Systems
-
 CSC209 — Systems Programming (C programming, memory management, Unix systems)
-
 CSC258 — Computer Organization (digital logic, CPU architecture, low-level computing concepts)
-
 CSC343 — Database Systems (relational databases, SQL, normalization)
 
-Keywords: systems programming, operating systems concepts, computer architecture, databases, SQL, backend systems
-
 Theory and Algorithms
-
 CSC236 — Introduction to Theory of Computation (formal languages, automata, proofs)
-
 CSC263 — Data Structures and Analysis (trees, graphs, hashing, complexity analysis)
-
 CSC373 — Algorithm Design and Analysis (dynamic programming, greedy algorithms, graph algorithms)
 
-Keywords: algorithms, data structures, time complexity, graph algorithms, dynamic programming, proofs, computational theory
 
 Artificial Intelligence and Machine Learning
-
 CSC311 — Machine Learning (supervised learning, unsupervised learning, regression, classification)
-
 CSC384 — Artificial Intelligence (search algorithms, planning, reasoning)
-
 CSC413 — Neural Networks and Deep Learning (backpropagation, CNNs, optimization methods)
 
-Keywords: machine learning, deep learning, neural networks, artificial intelligence, classification, regression, gradient descent, reinforcement learning, probabilistic models
-
 Software Engineering and Applications
-
 CSC207 — Software Design (object-oriented programming, design patterns, testing)
-
 CSC309 — Web Programming (frontend and backend development, APIs)
-
 CSC320 — Visual Computing (graphics, visualization techniques)
-
 CSC300 — Computers and Society (ethical and societal impact of computing)
-
-Keywords: software engineering, object-oriented programming, web development, full-stack development, APIs, UI/UX, software design patterns, human-computer interaction
 
 Interests and Hobbies
 Astronomy
-
 I am interested in amateur astronomy and observational astrophysics. I own a 12-inch Dobsonian telescope that I use regularly for observing celestial objects including Jupiter, Mars, Venus, and deep-sky objects such as nebulae, star clusters, and galaxies.
 
-Keywords: astronomy, telescope, Dobsonian telescope, planetary observation, stargazing, astrophysics, celestial objects, night sky observation
-
 Fitness
-
 I maintain a consistent fitness routine and train using a home gym setup.
 
 
