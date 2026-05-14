@@ -34,5 +34,3 @@ Provides a complete labeled-image ingestion pipeline with structured metadata fo
 Implements a verification workflow that updates image approval state and calculates user validity percentage.
 Enables cashier/manager roles to review pending images and validate annotations before dataset packaging.
 Lays groundwork for ML-assisted verification and future scalable storage/back-end migration.
-Keywords:
-image labeling, annotation, bounding box, CV dataset, Prisma ORM, Express REST API, JWT authentication, role-based access control, multer upload, image verification, dataset export, Expo React Native, PostgreSQL/SQLite, local file storage, user validity percentage, machine learning verification, verification pipeline, mobile app, annotations CRUD.

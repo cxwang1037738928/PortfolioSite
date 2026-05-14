@@ -26,5 +26,3 @@ Outcomes:
 Works as a self-contained solver for input-driven checkers board states.
 Uses depth-limited alpha-beta pruning at fixed depth_limit = 7.
 Produces deterministic move sequences in an output file without networking or external services.
-Keywords:
-checkers, minimax, alpha-beta pruning, game tree search, board evaluation, heuristic, forced capture, jump chaining, king promotion, 8x8 grid, Python command-line, file input/output, state space exploration, adversarial AI.

@@ -8,8 +8,8 @@ Tech Stack:
 
 PyTorch (deep learning framework)
 Python
-CUDA (GPU acceleration)
-NumPy, Matplotlib, Pandas, Seaborn (data visualization and utilities)
+
+NumPy, Matplotlib, Pandas
 Architecture:
 Stacked multi-layer transformer with two distinct components:
 
@@ -33,5 +33,4 @@ Validation loss monitoring with early stopping (patience configurable)
 Qualitative translation outputs per epoch on test sentence ("the air conditioning is working")
 Attention weight visualization per decoder layer showing alignment between input and output characters
 Checkpoint saving of best models (encoder, decoder, vocabulary mappings)
-Keywords:
-transformer, encoder-decoder, scaled-dot-product-attention, causal-attention, self-attention, cross-attention, positional-encodings, character-level-seq2seq, residual-connections, multi-layer-stacking, batch-bucketing, cross-entropy-loss, adam-optimizer, learning-rate-decay, early-stopping, character-embedding, feed-forward-networks, attention-visualization, token-classification
+

@@ -1,3 +1,5 @@
+// scripts/buildEmbeddings.js
+
 // static build script to create document embeddings for all files in the documents directory
 
 import fs from 'fs';

@@ -13,17 +13,13 @@ Tech Stack:
  - Frontend: React (Vite), client-side JS for embedding
  - Backend: Node serverless/API route (api/chat.js) placeholder
  - Embeddings: client-side model (WebAssembly/ONNX or remote embeddings)
- - Vector index options: FAISS, Annoy, HNSWlib, or managed (Pinecone, Qdrant, 
-Milvus, Weaviate, PGVector)
- - LLM: hosted API (Openroute mentioned) or OpenAI/compatible model
- - Infra: CDN, object storage (S3), secrets manager, serverless hosting 
-(Vercel/Netlify) or container hosts
+ - LLM: OpenAI mini 5.4
+ - Infra: serverless hosting Vercel
 
 Architecture:
 
  - In-browser: tokenize & embed query → send vector (or raw query) to backend
- - Backend: vector DB lookup (ANN) → retrieve top-k chunks with metadata → rerank 
-/ filter (temporal, source) → assemble prompt/context → call LLM → return answer +
+ - Backend: vector DB lookup (ANN) → retrieve top-k chunks with metadata → filter → assemble prompt/context → call LLM → return answer +
  provenance
  - Indexing pipeline: document chunking, embedding, metadata store, periodic 
 reindexing
@@ -46,15 +42,6 @@ Challenges:
  - Cost/latency of LLM calls; batching and caching top-k responses
  - Evaluation: building relevance labels and offline metrics
 
-Performance / Scaling considerations:
-
- - Index sharding, replication, and ANN tuning (ef/search_k, M, PQ bits)
- - Quantization to reduce storage (int8/PQ) vs reduced accuracy
- - Caching hot queries and top-k embeddings; TTLs for dynamic content
- - P50/P95 latency targets (vector lookup + LLM call pipeline) and throughput 
-planning (QPS)
- - Monitoring: recall@k, MRR/NDCG, freshness, error rates, cost per query
-
 
 Outcomes:
 
@@ -65,7 +52,4 @@ retrieved-context filtering and reranking
  - Traceability via source-level provenance enables auditing and user-facing 
 citations
 
-Keywords: semantic search, embeddings, retrieval-augmented generation, RAG, ANN,
-HNSW, FAISS, Pinecone, Qdrant, vector DB, PGVector, client-side embeddings,
-WebAssembly, ONNX, chunking, prompt engineering, reranking, provenance, recall@k,
-NDCG, MRR, latency, quantization, reindexing, hybrid search.
+

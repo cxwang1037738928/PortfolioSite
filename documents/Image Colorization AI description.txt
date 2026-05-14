@@ -12,7 +12,6 @@ CIFAR-10 dataset (32×32 RGB images, 50K train / 10K test)
 k-means color clustering (24 discrete color categories pre-computed)
 NumPy for tensor manipulation
 PIL for image I/O
-CUDA GPU support
 Adam optimizer (lr=0.001)
 CrossEntropyLoss (multi-class pixel-wise classification)
 Architecture:
@@ -34,7 +33,3 @@ Training loop: 25 epochs, batch_size=100, convergence tracking via train/validat
 Model serialization via torch.save checkpoint support
 Visualization pipeline generates per-epoch output PNG comparisons (grayscale input vs. ground-truth vs. predicted colorization)
 Activation map extraction for debugging network layer responses
-Keywords:
-image-to-image translation, conditional colorization, semantic color prediction, pixel-wise dense prediction, encoder-decoder CNN, stride-2 downsampling, learnable upsampling (transposed convolution), discrete color quantization, k-means color codebook, multi-class dense classification, CIFAR-10 horse subset, batch normalization, GPU CUDA, checkpoint serialization, validation accuracy per-pixel
-
-This summary prioritizes implementation details, architectural choices, and technical constraints relevant for retrieval and embedding similarity searches.
