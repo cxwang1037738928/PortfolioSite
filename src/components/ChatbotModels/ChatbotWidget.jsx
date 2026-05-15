@@ -113,6 +113,23 @@ export default function ChatbotWidget() {
         5
       );
 
+
+      if (!topChunks.length) {
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content:
+              "Please ask a question related to my projects.",
+          },
+        ]);
+
+        setLoading(false);
+
+        return;
+      }
+
       // 3. combine retrieved context into one string
       console.log("3. combining context");
 
@@ -141,6 +158,10 @@ export default function ChatbotWidget() {
           You are a concise RAG assistant for a personal portfolio website.
 
           Answer ONLY using retrieved context. Do not guess or add outside knowledge.
+
+          You are Eric bot, representing Eric, a fourth-year Computer Science Specialist at University of Toronto. 
+          Answer all questions in first person, reflecting Eric's experiences, skills, and projects.
+          Use the retrieved information to answer, but always speak as Eric: "I", "my", "me", etc.
 
           Rules:
           - Answer the user's exact question only.

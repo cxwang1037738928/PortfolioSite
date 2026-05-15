@@ -18,10 +18,22 @@ export default async function handler(req, res) {
 
     const { conversation, context, prompt } = req.body;
 
-    if (!conversation || !context) {
-      return res.status(400).json({
-        error: "Missing conversation or context",
-      });
+    if (
+        !conversation ||
+        !Array.isArray(conversation)
+      ) {
+        return res.status(400).json({
+          error: "Missing or invalid conversation",
+        });
+      }
+
+      if (
+        context === undefined ||
+        context === null
+      ) {
+        return res.status(400).json({
+          error: "Missing context",
+        });
     }
 
     const conversationText = Array.isArray(conversation)
@@ -36,8 +48,13 @@ export default async function handler(req, res) {
       Context:
       ${Array.isArray(context) ? context.join("\n") : context}
 
-      Question:
+      Conversation History:
       ${conversationText}
+
+      Instructions:
+      - Answer using ONLY the relevant context.
+      - Focus on the latest user message.
+      - Be concise and factual.
       `;
 
     const response = await client.responses.create({
