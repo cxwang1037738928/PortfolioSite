@@ -3,83 +3,144 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
+
 import { pipeline } from "@xenova/transformers";
 
 const DOCS_DIR = "./documents";
 const OUTPUT_FILE = "./public/documents.json";
 
-const MAX_CHARS = 500; // max characters per chunk, adjust as needed
+const MAX_CHARS = 1200;
 
-/* -----------------------------
-   CLEANING
------------------------------ */
+/* ---------------------------------------
+   TEXT CLEANING
+--------------------------------------- */
 
 function cleanText(text) {
   return text
-    // remove obvious keyword sections if present
-    .replace(/keywords?:[\s\S]*$/im, "")
-    // normalize whitespace
     .replace(/\r/g, "")
+    .replace(/\t/g, " ")
+    .replace(/[ ]{2,}/g, " ")
     .trim();
 }
 
-/* -----------------------------
-   CHUNKING (HYBRID)
------------------------------ */
+/* ---------------------------------------
+   METADATA INFERENCE
+--------------------------------------- */
 
-// detect structure (markdown or fallback)
-function detectSections(text) {
-  if (text.includes("\n## ")) {
-    return text.split(/\n##\s+/);
+function inferType(filename, text) {
+  const lower = (
+    filename + " " + text
+  ).toLowerCase();
+
+  if (
+    lower.includes("project") ||
+    lower.includes("architecture") ||
+    lower.includes("tech stack")
+  ) {
+    return "project";
   }
 
-  return text.split(/\n\s*\n/);
+  if (
+    lower.includes("csc") ||
+    lower.includes("course")
+  ) {
+    return "coursework";
+  }
+
+  if (
+    lower.includes("astronomy") ||
+    lower.includes("fitness") ||
+    lower.includes("telescope")
+  ) {
+    return "hobby";
+  }
+
+  return "general";
 }
 
-// normalize chunk
-function normalize(chunk) {
-  return chunk.trim().replace(/\s+/g, " ");
+/* ---------------------------------------
+   SECTION DETECTION
+--------------------------------------- */
+
+function detectSections(text) {
+
+  // markdown headings
+  if (text.includes("\n##")) {
+
+    return text
+      .split(/\n(?=##)/)
+      .map(s => s.trim())
+      .filter(Boolean);
+  }
+
+  // fallback: paragraph grouping
+  return text
+    .split(/\n\s*\n/)
+    .map(s => s.trim())
+    .filter(Boolean);
 }
 
-// sentence fallback splitter
-function splitBySentences(text, maxChars = MAX_CHARS) {
-  const sentences = text.split(/(?<=[.!?])\s+/);
+/* ---------------------------------------
+   SPLIT LARGE CHUNKS
+--------------------------------------- */
+
+function splitLargeChunk(
+  text,
+  maxChars = MAX_CHARS
+) {
+
+  if (text.length <= maxChars) {
+    return [text];
+  }
+
+  const sentences = text.split(
+    /(?<=[.!?])\s+/
+  );
 
   const chunks = [];
+
   let current = "";
 
-  for (const s of sentences) {
-    if (current.length + s.length > maxChars) {
-      if (current) chunks.push(current.trim());
-      current = s;
+  for (const sentence of sentences) {
+
+    if (
+      current.length + sentence.length >
+      maxChars
+    ) {
+
+      if (current.trim()) {
+        chunks.push(current.trim());
+      }
+
+      current = sentence;
+
     } else {
-      current += " " + s;
+
+      current += " " + sentence;
     }
   }
 
-  if (current) chunks.push(current.trim());
+  if (current.trim()) {
+    chunks.push(current.trim());
+  }
 
   return chunks;
 }
 
-// enforce size limit
-function enforceSize(chunk, maxChars = MAX_CHARS) {
-  if (chunk.length <= maxChars) return [chunk];
-  return splitBySentences(chunk, maxChars);
-}
+/* ---------------------------------------
+   MAIN CHUNKER
+--------------------------------------- */
 
-// main chunker
 function chunkText(text) {
+
   const sections = detectSections(text);
 
   const chunks = [];
 
   for (const section of sections) {
-    const cleaned = normalize(section);
 
-    if (!cleaned) continue;
-
-    const split = enforceSize(cleaned);
+    const split =
+      splitLargeChunk(section);
 
     chunks.push(...split);
   }
@@ -87,64 +148,117 @@ function chunkText(text) {
   return chunks;
 }
 
-/* -----------------------------
-   EMBEDDING UTILS
------------------------------ */
+/* ---------------------------------------
+   EMBEDDING COMPRESSION
+--------------------------------------- */
 
-// rounds down all embedding to a certain decimal
-function truncateEmbedding(arr, precision = 5) {
-  return Array.from(arr).map((v) =>
+function truncateEmbedding(
+  arr,
+  precision = 5
+) {
+
+  return Array.from(arr).map(v =>
     Number(v.toFixed(precision))
   );
 }
 
-/* -----------------------------
-   MAIN PIPELINE
------------------------------ */
+/* ---------------------------------------
+   MAIN
+--------------------------------------- */
 
 async function main() {
-  console.log("Loading embedding model...");
+
+  console.log("Loading model...");
 
   const extractor = await pipeline(
     "feature-extraction",
     "Xenova/all-MiniLM-L6-v2"
   );
 
-  const files = fs.readdirSync(DOCS_DIR);
+  const files =
+    fs.readdirSync(DOCS_DIR);
 
   const documents = [];
 
   for (const file of files) {
-    const filePath = path.join(DOCS_DIR, file);
 
-    if (!fs.statSync(filePath).isFile()) continue;
+    const filePath =
+      path.join(DOCS_DIR, file);
+
+    const stat =
+      fs.statSync(filePath);
+
+    if (!stat.isFile()) continue;
 
     console.log(`Processing ${file}...`);
 
-    const raw = fs.readFileSync(filePath, "utf-8");
+    const raw =
+      fs.readFileSync(
+        filePath,
+        "utf-8"
+      );
 
-    const cleaned = cleanText(raw);
+    const cleaned =
+      cleanText(raw);
 
-    const chunks = chunkText(cleaned);
+    const chunks =
+      chunkText(cleaned);
 
-    for (let i = 0; i < chunks.length; i++) {
+    const title =
+      file.replace(/\.[^/.]+$/, "");
+
+    const type =
+      inferType(file, cleaned);
+
+    for (
+      let i = 0;
+      i < chunks.length;
+      i++
+    ) {
+
       const chunk = chunks[i];
 
-      const output = await extractor(chunk, {
-        pooling: "mean",
-        normalize: true,
-      });
+      // IMPORTANT:
+      // inject source/project identity
+      // directly into embedding text
+      const embeddingText = `
+Project: ${title}
+
+Type: ${type}
+
+${chunk}
+`;
+
+      const output =
+        await extractor(
+          embeddingText,
+          {
+            pooling: "mean",
+            normalize: true,
+          }
+        );
 
       documents.push({
+
         id: crypto.randomUUID(),
+
         source: file,
+
         chunkIndex: i,
+
         text: chunk,
 
-        embedding: truncateEmbedding(output.data),
+        embedding:
+          truncateEmbedding(
+            output.data
+          ),
 
         metadata: {
-          title: file.replace(/\.[^/.]+$/, ""),
+
+          title,
+
+          type,
+
           length: chunk.length,
         },
       });
@@ -153,10 +267,16 @@ async function main() {
 
   fs.writeFileSync(
     OUTPUT_FILE,
-    JSON.stringify(documents, null, 2)
+    JSON.stringify(
+      documents,
+      null,
+      2
+    )
   );
 
-  console.log(`Saved ${documents.length} chunks`);
+  console.log(
+    `Saved ${documents.length} chunks`
+  );
 }
 
 main();

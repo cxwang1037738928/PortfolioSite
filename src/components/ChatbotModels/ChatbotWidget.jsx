@@ -14,7 +14,7 @@ export default function ChatbotWidget() {
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content: "Hi, I'm Eric bot! Ask me anything about my projects. Note that responses may take up to ~10 seconds since I embed the user query and perform retrival in the browser instead of a dedicated backend server.",
+      content: "Hi, I'm Eric bot! Ask me anything about my projects, coursework, or hobbies.",
     },
   ]);
 
@@ -100,8 +100,16 @@ export default function ChatbotWidget() {
 
       // 1. embed the user query live in browser
       console.log("1. started embedding");
+      
+      // embed up to four messages in the conversation history for better context
+      const retrievalQuery = [
+        ...messages.slice(-4),
+        { role: "user", content: currentInput }
+      ]
+      .map(m => m.content)
+      .join(" ");
 
-      const queryEmbedding = await embedQuery(currentInput);
+      const queryEmbedding = await embedQuery(retrievalQuery);
 
       // 2. retrieve top K most relevant chunks
       console.log("2. started searching");
@@ -133,9 +141,31 @@ export default function ChatbotWidget() {
       // 3. combine retrieved context into one string
       console.log("3. combining context");
 
-      const context = topChunks
-        .map((doc) => doc.text)
-        .join("\n\n");
+      const sourceCounts = {};
+
+      for (const chunk of topChunks) {
+
+        sourceCounts[chunk.source] =
+          (sourceCounts[chunk.source] || 0) + 1;
+      }
+
+      // dominant file/source
+      const dominantSource =
+        Object.entries(sourceCounts)
+          .sort((a, b) => b[1] - a[1])[0][0];
+
+      // only keep chunks
+      // from dominant source
+      const focusedChunks =
+        topChunks.filter(
+          chunk =>
+            chunk.source === dominantSource
+        );
+
+      const context =
+        focusedChunks
+          .map(doc => doc.text)
+          .join("\n\n");
 
       // 4. send user question + retrieved context
       console.log("4. sending to backend with context:");
