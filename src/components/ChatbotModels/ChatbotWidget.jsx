@@ -1,6 +1,6 @@
 // src/components/ChatbotModels/ChatbotWidget.jsx
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { embedQuery } from "../../../lib/embedQuery.js";
 import { searchDocuments } from "../../../lib/search.js";
@@ -23,6 +23,12 @@ export default function ChatbotWidget() {
 
   // stores embedded document chunks
   const [documents, setDocuments] = useState([]);
+
+  // stores embedded assistant response chunks so they can be searched
+  // alongside document chunks in future queries, giving the model memory
+  // of what it has already said without sending the full message history.
+  // each entry mirrors the document chunk shape: { text, embedding, source }
+  const assistantChunksRef = useRef([]);
 
   // open chatbot 3 seconds after page load
   useEffect(() => {
@@ -58,35 +64,20 @@ export default function ChatbotWidget() {
 
   async function sendMessage() {
 
-    if (!input.trim()) return;
+    if (!input.trim()) return; // return if no input
     const now = new Date();
     if (now - lastMessageTime < 1000) {
-      return;
+      return; // prevent sending if last message was less than 1 second ago
     }
     setLastMessageTime(now);
 
 
-      // prevent spamming messages  
-
-  //   // don't try to answer questions if documents aren't loaded yet, since we won't have any context to provide to the backend
-  //   if (!documents.length) {
-
-  //   setMessages((prev) => [
-  //     ...prev,
-  //     {
-  //       role: "assistant",
-  //       content:
-  //         "Documents are still loading. Please wait a moment.",
-  //     },
-  //   ]);
-
-  //   return;
-  // }
-
+    // format user message as a json object with role and content
     const userMessage = {
       role: "user",
       content: input,
     };
+
 
     setMessages((prev) => [...prev, userMessage]);
 
@@ -98,22 +89,18 @@ export default function ChatbotWidget() {
 
     try {
 
-      // 1. embed the user query live in browser
+      // 1. embed only the user's latest query (not the last four messages).
+      //    prior context is handled by searching assistant response chunks instead.
       console.log("1. started embedding");
-      
-      // embed up to four messages in the conversation history for better context
-      const retrievalQuery = [
-        ...messages.slice(-4),
-        { role: "user", content: currentInput }
-      ]
-      .map(m => m.content)
-      .join(" ");
 
-      const queryEmbedding = await embedQuery(retrievalQuery);
+      const queryEmbedding = await embedQuery(currentInput);
+
+      console.log("retrieval query:", currentInput);
 
       // 2. retrieve top K most relevant chunks
       console.log("2. started searching");
 
+      // perform cosine similary search betweeen the embedded user query and documents
       const topChunks = searchDocuments(
         currentInput,
         queryEmbedding,
@@ -121,7 +108,7 @@ export default function ChatbotWidget() {
         5
       );
 
-
+      // stop the function and add last user message to array if there are no relevant chunks
       if (!topChunks.length) {
 
         setMessages((prev) => [
@@ -138,49 +125,86 @@ export default function ChatbotWidget() {
         return;
       }
 
-      // 3. combine retrieved context into one string
+      // 3. search the assistant response chunk store with the same query embedding
+      //    and merge those results with the document chunks, then re-rank by score
+      //    and take the top 4 to send as context. this replaces sending the full
+      //    conversation history to the backend.
       console.log("3. combining context");
 
+      // search prior assistant responses as if they were document chunks
+      const assistantHits = searchDocuments(
+        currentInput,
+        queryEmbedding,
+        assistantChunksRef.current,
+        5 // retrieve up to 5 assistant chunks before merging
+      );
+
+      // merge document chunks and assistant response chunks into one pool,
+      // sort descending by score, and keep the top 4
+      const mergedChunks = [...topChunks, ...assistantHits]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4);
+
+      // start counting the number of times each source/file appears in the top chunks
+      // The Search.js document dominant source scoring wasn't efficient enough, and the
+      // GPT still hallucinates information from multiple sources, so this
+      // only gets chunks from the dominant source.
       const sourceCounts = {};
 
-      for (const chunk of topChunks) {
+      for (const chunk of mergedChunks) {
 
-        sourceCounts[chunk.source] =
-          (sourceCounts[chunk.source] || 0) + 1;
+      const source = chunk.source;
+
+      if (sourceCounts[source] === undefined) {
+        sourceCounts[source] = 1;
+      } else {
+        sourceCounts[source] += 1;
       }
+    }
 
-      // dominant file/source
-      const dominantSource =
-        Object.entries(sourceCounts)
-          .sort((a, b) => b[1] - a[1])[0][0];
+      // identify the dominant file/source
+      let dominantSource = null;
+      let largest = -Infinity;
 
-      // only keep chunks
-      // from dominant source
+      for (const key in sourceCounts) {
+        if (sourceCounts[key] > largest) {
+          largest = sourceCounts[key];
+          dominantSource = key;
+        }
+      }
+      
+      // outdated nlogn method to find dominant source, replaced with linear scan above
+      // const dominantSource =
+      //   Object.entries(sourceCounts)
+      //     .sort((a, b) => b[1] - a[1])[0][0]; // takes key name count of the first source in the sorted array
+
+      console.log("Dominant source:", dominantSource);
+
+      // filter the top chunks to only include those from the dominant source, O(n)
       const focusedChunks =
-        topChunks.filter(
+        mergedChunks.filter(
           chunk =>
             chunk.source === dominantSource
         );
+      
+      // combine the text of the focused chunks into one string to send as context to the backend
+      const context = focusedChunks.map(chunk => chunk.text).join("\n\n");
 
-      const context =
-        focusedChunks
-          .map(doc => doc.text)
-          .join("\n\n");
-
-      // 4. send user question + retrieved context
-      console.log("4. sending to backend with context:");
-
+      // 4. send user question + retrieved context.
+      //    conversation now contains only the current user query; the top 4
+      //    merged chunks (passed via context) replace the full message history.
+      console.log("4. sending to backend with context:", context);
+      // need to change this if backend is running on a different domain as frontend
       const response = await fetch("/api/chat", {
         method: "POST",
 
         headers: {
           "Content-Type": "application/json",
         },
-
+        
         body: JSON.stringify({
           conversation: [
-            ...messages, // entire conversation history for better context, not just latest question
-            { role: "user", content: currentInput },
+            { role: "user", content: currentInput }, // only the latest user query, not entire conversation history
             ],
           context, // optional
           prompt: `
@@ -218,6 +242,20 @@ export default function ChatbotWidget() {
 
       const data = await response.json();
 
+      // 5. embed the assistant's reply and store it as a searchable chunk so
+      //    future queries can retrieve it alongside document chunks, giving the
+      //    model awareness of what it has already answered without needing to
+      //    send the entire conversation history on every turn.
+      console.log("5. embedding assistant reply and storing as chunk");
+
+      const replyEmbedding = await embedQuery(data.reply);
+
+      assistantChunksRef.current.push({
+        text: data.reply,
+        embedding: replyEmbedding,
+        source: "assistant", // mark source so it can be identified during merging
+      });
+
       setMessages((prev) => [
         ...prev,
         {
@@ -230,6 +268,7 @@ export default function ChatbotWidget() {
 
       console.error(err);
 
+      // set error message in chatbot if something goes wrong with the API call
       setMessages((prev) => [
         ...prev,
         {
@@ -394,12 +433,14 @@ export default function ChatbotWidget() {
 
               placeholder="Ask about my projects..."
 
+              // on enter send the message
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   sendMessage();
                 }
               }}
-
+              
+              // style the input box
               style={{
                 flex: 1,
                 padding: "12px",
