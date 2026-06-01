@@ -1,0 +1,34 @@
+## Project Overview
+This repository is a Canada statistics application that combines a data ingestion pipeline, backend API, and frontend visualization. It collects provincial data, seeds metrics, and serves interactive UI content.
+
+## Data Pipeline
+The `canada-data-pipeline/src` folder contains scripts for running the pipeline and seeding data:
+- `runPipeline.js`
+- `seedMetrics.js`
+- `seedProvinces.js`
+- `collectors/` includes data loaders, cube embedding generation, index building, and diagnostics.
+
+The pipeline likely builds a searchable data index, generates embeddings, and prepares provincial cubes for analytics.
+
+## Backend
+The `backend/server.js` file suggests a Node-based server that may expose API endpoints for the frontend or serve processed data. The presence of `prisma.config.ts` and `prisma/schema.prisma` indicates a Prisma ORM setup for database modeling and access.
+
+## Frontend
+The `frontend/` folder contains a Vite-powered web app with:
+- `src/App.jsx`, `main.jsx`, CSS styles
+- `components/CanadaMap.jsx` and `CanadaMap.css`
+- `public/` static assets
+
+This part likely renders a Canada map and displays provincial statistics interactively.
+
+## Configuration
+Project config files include:
+- `package.json` at root
+- `frontend/package.json`
+- `vercel.json`
+- `Readme.md`
+
+These define dependencies, scripts, and deployment settings.
+
+## Purpose
+Overall, the project collects, processes, and visualizes Canadian provincial statistics using a backend data service, a Prisma-managed database, and a frontend map-based interface.
