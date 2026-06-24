@@ -43,29 +43,26 @@ const ShowcaseSection = () => {
                 <div className="first-project-wrapper" ref={project1Ref}>
 
                     <div className="image-wrapper">
-                        <a href="https://github.com/cxwang1037738928/Labrador" target="_blank" rel="noopener noreferrer">
+                        <a href="https://canadamapped.ca" target="_blank" rel="noopener noreferrer">
                             <img
-                            src="/images/Labrador_fixed.png"
-                            alt="Ryde"
+                            src="/images/Canada_Mapped.png"
+                            alt="Canada Mapped"
                             />
                         </a>
                     </div>
                     <div>
-                        <h2>
-                            
-                        </h2>
+                        <h2>Canada Mapped</h2>
                         <p
                         className="text-white-50 md:text-xl"
                         >
-                        An app that allows users to label images and package them into containers of data for feeding into CV models. The app also features a dashboard for users to view and manage their datasets,
-                         as well as a hierarchy system for cashiers and managers to manage users and ensure quality control.
+                        A full-stack web application that lets users find Statistics Canada data tables using natural language queries and visualizes the results as a choropleth map of Canadian provinces. The backend uses semantic search with sentence-transformer embeddings, a re-ranking pipeline with an MLP subject classifier, and TF-IDF keyword boosting to surface the most relevant StatCan table from over 3,600 indexed cubes.
                         </p>
                     </div>
 
                 </div>
 
                 {/* RIGHT */}
-                
+
                 <div
                 className="project-list-wrapper overflow-hidden"
                 >
@@ -74,17 +71,17 @@ const ShowcaseSection = () => {
                     ref={project2Ref}
                     >
                         <div
-                        className="image-wrapper" // background color for project image
+                        className="image-wrapper"
                         >
-                            <a href="https://github.com/cxwang1037738928/Galaxy-Identifier" target="_blank" rel="noopener noreferrer">
+                            <a href="https://github.com/cxwang1037738928/Labrador" target="_blank" rel="noopener noreferrer">
                                 <img
-                            src="/images/Galaxy_Finder.png"
-                            alt="Library Management"
+                            src="/images/Labrador_fixed.png"
+                            alt="Labrador"
                             />
                             </a>
-                            
+
                         </div>
-                        <h2>An application that uses the Ultralytics YOLO model to segment and identify galaxy types, trained on augmented data from the Galaxy Zoo project.</h2>
+                        <h2>An app that allows users to label images and package them into containers of data for feeding into CV models, with a dashboard and a hierarchy system for quality control.</h2>
 
                     </div>
 
@@ -93,16 +90,16 @@ const ShowcaseSection = () => {
                     ref={project3Ref}
                     >
                         <div
-                        className="image-wrapper" // background color for project image
+                        className="image-wrapper"
                         >
-                            <a href="https://github.com/cxwang1037738928/ImageColorizationAI" target="_blank" rel="noopener noreferrer">
+                            <a href="https://github.com/cxwang1037738928/Galaxy-Identifier" target="_blank" rel="noopener noreferrer">
                                 <img
-                                src="/images/Greyscale_AI.png"
-                                alt="YC directory"
+                                src="/images/Galaxy_Finder.png"
+                                alt="Galaxy Finder"
                                 />
                             </a>
                         </div>
-                        <h2>A greyscale image colorization AI that I made as part of a course which uses two convolutional neural network architectures, PoolUpsampleNet and ConvTransposeNet, to predict pixel-wise colors from grayscale images</h2>
+                        <h2>An application that uses the Ultralytics YOLO model to segment and identify galaxy types, trained on augmented data from the Galaxy Zoo project.</h2>
 
                     </div>
 

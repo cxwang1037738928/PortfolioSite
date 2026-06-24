@@ -1,9 +1,8 @@
-// pages/api/llm.js
+// /api/chat.js
 
 import OpenAI from "openai";
 
 
-// hard coding API key for testing, will be removed in production and set via environment variable
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -12,25 +11,18 @@ export default async function handler(req, res) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({
-        error: "Method not allowed",
+        error: "Use POST method to interact with this endpoint",
       });
     }
-
     const { conversation, context, prompt } = req.body;
 
-    if (
-        !conversation ||
-        !Array.isArray(conversation)
-      ) {
+    if (!conversation ||!Array.isArray(conversation)) {
         return res.status(400).json({
           error: "Missing or invalid conversation",
         });
       }
 
-      if (
-        context === undefined ||
-        context === null
-      ) {
+      if (context === undefined ||context === null) {
         return res.status(400).json({
           error: "Missing context",
         });

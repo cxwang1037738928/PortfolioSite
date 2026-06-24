@@ -6,9 +6,9 @@ import crypto from "crypto";
 
 import { pipeline } from "@xenova/transformers";
 // directory where the source documents are stored
-const DOCS_DIR = "./documents";
+const DOCS_DIR = "../documents";
 // file path of the output JSON file that will store the chunks and their embeddings
-const OUTPUT_FILE = "./public/documents.json";
+const OUTPUT_FILE = "../public/documents.json";
 
 // max characters per chunk (after sectioning)
 const MAX_CHARS = 1200;
