@@ -473,56 +473,102 @@ section {
 
 
 
-/* Skills Section */
+/* Skills + Education */
+@layer components {
 
-/* Section */
-.skills-section {
-  min-height: 100vh;
-  background: #0f172a;
-  padding: 80px 20px;
-  text-align: center;
-}
+  /* Shared pill, used for skills and for coursework.
+     Proficiency reads through the fill rather than the size. */
+  .skill-pill {
+    @apply inline-flex items-center rounded-full border px-4 py-1.5 text-sm md:text-base
+           transition-all duration-300 hover:-translate-y-0.5;
 
-.skills-title {
-  color: white;
-  font-size: 1.5rem;
-  margin-bottom: 40px;
-}
+    &.level-3 {
+      @apply bg-white text-black border-white;
+    }
 
-/* Bubble layout */
-.bubble-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  min-height: 300px;
-}
+    &.level-2 {
+      @apply bg-black-200 text-white border-black-200 hover:border-blue-50;
+    }
 
-/* Bubbles */
-.bubble {
-  flex-shrink: 0; /* prevents bubbles from shrinking on load */
-  border-radius: 9999px;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  color: white;
+    &.level-1 {
+      @apply bg-transparent text-white-50 border-black-200 hover:border-blue-50;
+    }
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+    /* filtered out: still readable, but out of the way */
+    &.is-dimmed {
+      @apply opacity-25;
+    }
 
-  font-size: 0.8rem;
-  padding: 10px;
+    /* the currently selected proficiency in the legend */
+    &.is-active {
+      @apply ring-2 ring-blue-50;
+    }
+  }
 
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-sizing: border-box; /* ensures padding is included in the element's total width and height */
+  /* only the legend pills are buttons */
+  button.skill-pill {
+    @apply cursor-pointer;
+  }
 
-}
+  .pill-row {
+    @apply flex flex-wrap gap-3;
+  }
 
-/* Hover effect */
-.bubble:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 25px rgba(59, 130, 246, 0.7);
+  .skills-section {
+    .skills-legend {
+      @apply flex flex-wrap items-center justify-center gap-3 mt-8;
+
+      span {
+        @apply text-white-50 text-sm uppercase tracking-widest mr-1;
+      }
+    }
+
+    .skill-groups {
+      @apply mt-12 max-w-5xl mx-auto;
+    }
+
+    /* label on the left, pills filling the rest of the row on desktop;
+       stacked on mobile. The top border is what separates the groups. */
+    .skill-group {
+      @apply flex flex-col md:flex-row md:items-baseline gap-4 md:gap-10
+             py-6 border-t border-black-200;
+
+      h3 {
+        @apply text-white-50 text-sm md:text-base uppercase tracking-widest md:w-44 shrink-0
+               transition-opacity duration-300;
+
+        &.is-dimmed {
+          @apply opacity-25;
+        }
+      }
+    }
+  }
+
+  .education-section {
+    .education-list {
+      @apply mt-12 max-w-5xl mx-auto;
+    }
+
+    .education-card {
+      @apply border border-black-200 rounded-xl p-6 md:p-8 space-y-6;
+    }
+
+    .education-head {
+      @apply flex flex-col md:flex-row md:items-start md:justify-between gap-2;
+
+      h3 {
+        @apply text-xl md:text-2xl font-semibold;
+      }
+
+      p {
+        @apply text-white-50 mt-1;
+      }
+    }
+
+    .education-date {
+      @apply text-white-50 text-sm md:text-base text-nowrap;
+    }
+  }
 }
 
 

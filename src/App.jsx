@@ -4,7 +4,7 @@ import ShowcaseSection from './sections/ShowcaseSection.jsx'
 import Navbar from './components/Navbar.jsx'
 import SkillsSection from './sections/SkillsSection.jsx'
 import ChatbotWidget from './components/ChatbotModels/ChatbotWidget.jsx'
-// import EducationSection from './sections/EducationSection.jsx'
+import EducationSection from './sections/EducationSection.jsx'
 
 
 const App = () => {
@@ -14,6 +14,7 @@ const App = () => {
         <Hero/>
         <ShowcaseSection/>
         <SkillsSection/>
+        <EducationSection/>
         <ChatbotWidget/>
     </main>
   )

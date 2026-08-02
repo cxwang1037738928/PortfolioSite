@@ -1,103 +1,97 @@
-import React from 'react';
-import { skills } from '../constants';
-import { useEffect } from "react";
-import gsap from "gsap";
+import { useRef, useState } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
-const getSize=(level) => {
-    switch(level) {
-        case 1:
-            return 60;
-        case 2:
-            return 100;
-        case 3:
-            return 140;
-        default:
-            return 100;
-    }
-};
+import TitleHeader from "../components/TitleHeader";
+import SkillPill from "../components/SkillPill";
+import { skills, skillCategories, skillLevels } from "../constants";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const SkillsSection = () => {
-    const [activeCategory, setActiveCategory] = React.useState(null);
-    const [activeSort, setActiveSort] = React.useState(null);
-    const [SortedSkills, setSortedSkills] = React.useState(null);
+    const groupRefs = useRef([]);
 
-    const categories = [...new Set(skills.map(skill => skill.category))];
+    // null = nothing selected, everything shown at full strength
+    const [activeLevel, setActiveLevel] = useState(null);
 
+    // clicking the selected level again clears the filter
+    const toggleLevel = (level) => setActiveLevel(current => current === level ? null : level);
 
-    return(
-        <>
-    <section
-    id="skills" className="skills-section">
-      <h2 className="skills-title">Use the buttons below to categorize skills, large bubbles represent higher proficiency</h2>
+    /* Fade each group in as it scrolls into view, same treatment as the project cards */
+    useGSAP(() => {
+        groupRefs.current.forEach((group, index) => {
+            gsap.fromTo(
+                group,
+                { y: 30, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, delay: 0.15 * index, scrollTrigger: { trigger: group, start: 'top bottom-=80' } }
+            );
+        });
+    }, []);
 
-      <div style={{marginBottom: '20px'}}>
-        {categories.map(category => (
-            <button 
-                key={category}
-                onClick={() => setActiveCategory(activeCategory === category ? null : category)} /* toggle category on click */
-                style={{
-                    marginRight: 10,
-                    opacity: activeCategory && activeCategory !== category ? 0.5: 1, /* */
-                }}
-            >
-                {category}
-            </button>
-        ))}
+    return (
+        <section id="skills" className="skills-section section-padding">
+            <div className="w-full h-full md:px-20 px-5">
 
-      </div>
+                <TitleHeader title="Skills" />
 
-      <div className="bubble-container">
-        {(activeSort && SortedSkills ? SortedSkills : skills).map((skill) => (
-          <div
-            key={skill.name}
-            className="bubble"
-            style={{
-                width: getSize(skill.level),
-                height: getSize(skill.level),
-                opacity: !activeCategory || skill.category === activeCategory? 1: 0.3,
-                transition: "opacity 0.3s",
-            }}
-          >
-            {skill.name}
-          </div>
-        ))}
-      </div>
+                {/* Doubles as a style key and as the filter: each entry is rendered in
+                    the same pill style the skills of that level use, and clicking one
+                    highlights those skills below */}
+                <div className="skills-legend">
+                    <span>Filter by proficiency</span>
+                    {skillLevels.map(({ level, label }) => (
+                        <SkillPill
+                        key={level}
+                        label={label}
+                        level={level}
+                        onClick={() => toggleLevel(level)}
+                        active={activeLevel === level}
+                        dimmed={activeLevel !== null && activeLevel !== level}
+                        />
+                    ))}
+                </div>
 
-      <button
-      key={"Sort by proficiency"}
-        onClick = {() => {setSortedSkills([...skills].sort((a,b) => b.level - a.level))
-        setActiveSort(activeSort === true ? null : true)
-        }}
-        style={{
-            marginTop: 20,
-            opacity: activeSort === true ? 1 : 0.5,
-        }}
-      >
+                <div className="skill-groups">
+                    {skillCategories.map(({ key, label }, index) => {
 
-        Sort by Proficiency
-      </button>
-      
-    
-    <div id="Education" className="education-section max-w-xl mx-auto mt-20">
+                        // strongest skills first so each row leads with the solid pills
+                        const group = skills
+                            .filter(skill => skill.category === key)
+                            .sort((a, b) => b.level - a.level);
 
-        <div className="education-item bg-gray-800 bg-opacity-20 p-6 rounded shadow-inner">
-          <h3 className="text-xl font-semibold">University of Toronto</h3>
-          <span className="text-gray-300">Expected June 2027</span>
-          <p className="mt-2 text-gray-200">
-            Honors Bachelor of Science: Computer Science Specialist | Toronto, Canada
-          </p>
-        </div>
-      </div>
+                        if (group.length === 0) return null;
 
-    </section>
+                        // fade the heading too when nothing in the group matches the filter
+                        const groupMatches = activeLevel === null
+                            || group.some(skill => skill.level === activeLevel);
 
+                        return (
+                            <div
+                            className="skill-group"
+                            key={key}
+                            ref={el => (groupRefs.current[index] = el)}
+                            >
+                                <h3 className={groupMatches ? "" : "is-dimmed"}>{label}</h3>
 
+                                <div className="pill-row">
+                                    {group.map(skill => (
+                                        <SkillPill
+                                        key={skill.name}
+                                        label={skill.name}
+                                        level={skill.level}
+                                        dimmed={activeLevel !== null && skill.level !== activeLevel}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
 
-    
-    </>
-    
-    )
+            </div>
+        </section>
+    );
 };
-
 
 export default SkillsSection;

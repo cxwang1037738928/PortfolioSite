@@ -3,7 +3,31 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
+import RotatingImage from "../components/RotatingImage";
+
 gsap.registerPlugin(ScrollTrigger);
+
+/* Screenshots each project card cycles through, in display order.
+   Add new files to public/images and append them here. */
+const OPENCRAWL_IMAGES = [
+    "/images/OpenCrawl.png",
+    "/images/OpenCrawl_2.png",
+    "/images/OpenCrawl_3.png",
+    "/images/OpenCrawl_4.png",
+    "/images/OpenCrawl_5.png",
+];
+
+const CANADA_MAPPED_IMAGES = [
+    "/images/Canada_Mapped.png",
+];
+
+const LABRADOR_IMAGES = [
+    "/images/Labrador_fixed.png",
+    "/images/Labrador_2.jpg",
+    "/images/Labrador_3.jpg",
+    "/images/Labrador_4.jpg",
+    "/images/Labrador_5.jpg",
+];
 
 const ShowcaseSection = () => {
     const sectionRef = useRef(null);
@@ -43,19 +67,24 @@ const ShowcaseSection = () => {
                 <div className="first-project-wrapper" ref={project1Ref}>
 
                     <div className="image-wrapper">
-                        <a href="https://canadamapped.ca" target="_blank" rel="noopener noreferrer">
-                            <img
-                            src="/images/Canada_Mapped.png"
-                            alt="Canada Mapped"
+                        <a
+                        href="https://opencrawl-demo.onrender.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block relative w-full h-full"
+                        >
+                            <RotatingImage
+                            images={OPENCRAWL_IMAGES}
+                            alt="OpenCrawl"
                             />
                         </a>
                     </div>
                     <div>
-                        <h2>Canada Mapped</h2>
+                        <h2>OpenCrawl</h2>
                         <p
                         className="text-white-50 md:text-xl"
                         >
-                        A full-stack web application that lets users find Statistics Canada data tables using natural language queries and visualizes the results as a choropleth map of Canadian provinces. The backend uses semantic search with sentence-transformer embeddings, a re-ranking pipeline with an MLP subject classifier, and TF-IDF keyword boosting to surface the most relevant StatCan table from over 3,600 indexed cubes.
+                        A self-hosted document intelligence and RAG platform where research PDFs are OCR'd, chunked, embedded, clustered, ranked, and assembled into a knowledge graph. Every answer in chat cites its source, and clicking a citation opens the PDF with the supporting sentences highlighted. Retrieval blends BM25 with dense cosine similarity and 2-hop graph traversal, and each citation is re-checked against the retrieved text so quotes must match verbatim and paraphrases must clear a lexical or semantic bar.
                         </p>
                     </div>
 
@@ -73,15 +102,21 @@ const ShowcaseSection = () => {
                         <div
                         className="image-wrapper"
                         >
-                            <a href="https://github.com/cxwang1037738928/Labrador" target="_blank" rel="noopener noreferrer">
-                                <img
-                            src="/images/Labrador_fixed.png"
-                            alt="Labrador"
-                            />
+                            <a
+                            href="https://canadamapped.ca"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block relative w-full h-full"
+                            >
+                                <RotatingImage
+                                images={CANADA_MAPPED_IMAGES}
+                                alt="Canada Mapped"
+                                delay={1200}
+                                />
                             </a>
 
                         </div>
-                        <h2>An app that allows users to label images and package them into containers of data for feeding into CV models, with a dashboard and a hierarchy system for quality control.</h2>
+                        <h2>A full-stack web application that finds Statistics Canada data tables from natural language queries and visualizes them as a choropleth map of the provinces, using semantic search over 3,600+ indexed cubes with an MLP subject classifier and TF-IDF keyword re-ranking.</h2>
 
                     </div>
 
@@ -92,14 +127,20 @@ const ShowcaseSection = () => {
                         <div
                         className="image-wrapper"
                         >
-                            <a href="https://github.com/cxwang1037738928/Galaxy-Identifier" target="_blank" rel="noopener noreferrer">
-                                <img
-                                src="/images/Galaxy_Finder.png"
-                                alt="Galaxy Finder"
+                            <a
+                            href="https://github.com/cxwang1037738928/Labrador"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block relative w-full h-full"
+                            >
+                                <RotatingImage
+                                images={LABRADOR_IMAGES}
+                                alt="Labrador"
+                                delay={2400}
                                 />
                             </a>
                         </div>
-                        <h2>An application that uses the Ultralytics YOLO model to segment and identify galaxy types, trained on augmented data from the Galaxy Zoo project.</h2>
+                        <h2>An app that allows users to label images and package them into containers of data for feeding into CV models, with a dashboard and a hierarchy system for quality control.</h2>
 
                     </div>
 

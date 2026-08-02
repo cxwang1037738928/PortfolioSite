@@ -73,6 +73,22 @@ const socialImgs = [
 
 ];
 
+// display order and headings for the skill groups in SkillsSection
+// key matches the "category" field on each skill below
+const skillCategories = [
+  { key: "language", label: "Languages" },
+  { key: "framework", label: "Frameworks" },
+  { key: "library", label: "Libraries & Data" },
+  { key: "tool", label: "Tools" },
+];
+
+// what each proficiency level means, used for the legend and pill styling
+const skillLevels = [
+  { level: 3, label: "Advanced" },
+  { level: 2, label: "Proficient" },
+  { level: 1, label: "Familiar" },
+];
+
 const skills = [
   // Languages
   { name: "JavaScript", level: 3, category: "language" },
@@ -103,6 +119,27 @@ const skills = [
   { name: "JavaFX", level: 1, category: "framework" },
 ];
 
+// Data for EducationSection.jsx
+const education = [
+  {
+    degree: "Honours Bachelor of Science, Computer Science Specialist",
+    focus: "Artificial Intelligence",
+    school: "University of Toronto",
+    location: "Toronto, Canada",
+    date: "Expected June 2027",
+    coursework: [
+      "CSC413 — Neural Networks & Deep Learning",
+      "CSC311 — Machine Learning",
+      "CSC384 — Artificial Intelligence",
+      "CSC373 — Algorithm Design",
+      "CSC343 — Database Systems",
+      "CSC209 — Systems Programming",
+      "CSC263 — Data Structures",
+      "CSC309 — Web Programming",
+    ],
+  },
+];
+
 export {
   words,
   abilities,
@@ -116,4 +153,7 @@ export {
   techStackImgs,
   navLinks,
   skills,
+  skillCategories,
+  skillLevels,
+  education,
 };

@@ -1,0 +1,62 @@
+# OpenCrawl — Document Intelligence & RAG Platform
+
+## What it does
+Self-hosted web app: upload research PDFs → indexed and knowledge-graphed → ask questions in
+chat → every answer cites its source, and clicking a citation opens the PDF with the supporting
+sentences highlighted. Design principle: verifiability over fluency.
+
+## Stack
+React 18 / Vite / Three.js / pdf.js · Node 22 + Express · PostgreSQL 16 + Prisma · Python 3.11
+Docling · Tesseract · GROBID · NetworkX · kg-gen + DSPy · scikit-learn · scispaCy
+Embeddings: all-MiniLM-L12-v2 (384-d, ONNX, runs in browser and backend)
+LLMs: Ollama (local) · Gemini · Azure AI Foundry — per-role model selection
+
+## Pipeline (5 stages)
+1. **Extract** — OCR routed per document by probing for a text layer (Docling fast path vs.
+   Tesseract). GROBID runs in parallel over HTTP for authors/references; Crossref resolves DOIs.
+2. **Embed** — structure-aware chunking (~180 words, section-aligned, tables kept whole, zero
+   overlap), MiniLM embeddings in batches.
+3. **Categorize** — mutual-kNN-gated single-linkage clustering + TF-IDF keywords per cluster.
+4. **Rank** — BM25 representativeness + vocabulary novelty (IDF) + PageRank over a citation graph
+   built from the papers' own bibliographies. Percentile-normalized, per-cluster quotas.
+5. **Graph** — LLM extracts (subject, predicate, object) triples; top 40% of docs read in full,
+   rest summarized. Cleanup passes: entity resolution, acronym merging (Schwartz–Hearst), NLI-based
+   predicate merging, author-node pruning.
+
+**Citation graph:** exact DOI match + fuzzy bidirectional title containment over an inverted token
+index, disambiguated by shared author surnames.
+
+**Retrieval:** BM25 (squared IDF, plural fallback) blended with dense cosine, category keyword
+boost, relative score floor instead of fixed top-K. GraphRAG adds graph facts via 2-hop traversal
+with hub gating, scored by IDF specificity × corroboration.
+
+**Verification:** every LLM citation is re-checked against retrieved text — quotes must match
+verbatim (8-word run), paraphrases must clear a lexical *or* semantic bar. Failures are flagged
+`[n!]` / `[!]`, not deleted.
+
+## Metrics (192-document corpus)
+- 6,628 chunks indexed
+- 20,301 entities · 22,260 relations · 2,581 predicates
+- 1,145 batched LLM calls, **0 failures**; 1.17M tokens
+- Cleanup: predicates 3,824 → 2,581 (−32%), 1,195 author nodes removed
+- 96% of entities grounded in source text (controlled run)
+
+## Key challenges
+- **Silent empty citation graph** — a bad variable produced zero edges; an empty graph is still a
+  valid graph, so nothing errored. Stages now report counts.
+- **Every clean page deskewed −10°** — skew estimator initialized best-variance to −∞, and a blank
+  page has 0 variance, so it always chose the search-range extreme.
+- **Reference parsing** — regex missed papers with references under other headings; GROBID fixed
+  that but mislabeled titles (license boilerplate, journal names), so matching became containment
+  rather than equality, with Crossref as primary and GROBID as per-field fallback.
+- **Dates lie** — PDF creation date is the *scan* or arXiv regeneration date, so a "cites the
+  future" check was deleting correct edges. Removed.
+- **Ranking favored long documents**, defeating the point — fixed-size windows, top-M mean with a
+  constant divisor, percentile normalization, per-cluster quotas.
+- **Cosine similarity was the wrong tool for acronyms** — DFT vs. "density functional theory"
+  scored 0.269, below unrelated pairs, while the corpus states the definition 121 times. Switched
+  from similarity to counting author-written definitions.
+- **Parser fragility ate the compute budget** — one bad element invalidated ~40 triples; 81% of
+  model work was recovery. A tolerant element-wise parser cut it to 1 dropped element in 1,145 calls.
+- **Negation still defeats verification** — "are not invariant" scores like "are invariant."
+  Mitigated, not solved; documented as an open gap.
