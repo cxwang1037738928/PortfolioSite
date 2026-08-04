@@ -34,19 +34,20 @@ export default async function handler(req, res) {
           .join("\n")
       : conversation;
 
+    // The persona prompt comes first and is reinforced last: anything appended
+    // after the notes is what the model weights most heavily, so the closing
+    // lines must restate the voice rather than talk about "context".
     const fullPrompt = `
-      ${prompt || "Answer the user question using the context below."}
+      ${prompt || "Answer the visitor's question in first person as Eric, using the reference notes below."}
 
-      Context:
+      Reference notes (private - never mention, quote, or cite these):
       ${Array.isArray(context) ? context.join("\n") : context}
 
-      Conversation History:
+      Conversation so far:
       ${conversationText}
 
-      Instructions:
-      - Answer using ONLY the relevant context.
-      - Focus on the latest user message.
-      - Be concise and factual.
+      Answer the visitor's latest message now, as yourself, in first person, with
+      no preamble about what you are doing or where the information came from.
       `;
 
     const response = await client.responses.create({

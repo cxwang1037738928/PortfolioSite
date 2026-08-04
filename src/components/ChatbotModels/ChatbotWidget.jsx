@@ -1,6 +1,6 @@
 // src/components/ChatbotModels/ChatbotWidget.jsx
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { embedQuery } from "../../../lib/embedQuery.js";
 import { searchDocuments } from "../../../lib/search.js";
@@ -21,8 +21,8 @@ export default function ChatbotWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // stores embedded document chunks
-  const [documents, setDocuments] = useState([]);
+  // caches the in-flight (or settled) documents.json request
+  const documentsRef = useRef(null);
 
   // stores embedded assistant response chunks so they can be searched
   // alongside document chunks in future queries, giving the model memory
@@ -39,28 +39,36 @@ export default function ChatbotWidget() {
     return () => clearTimeout(timer);
   }, []);
 
-  // load embedded documents once
-  useEffect(() => {
+  // documents.json is ~900KB. Fetching it on mount competed with the initial
+  // render, so it now waits until the chat is first opened. The promise is
+  // cached, so the request is made once no matter how often this is called.
+  const loadDocuments = useCallback(() => {
 
-    async function loadDocuments() {
+    if (!documentsRef.current) {
 
-      try {
+      documentsRef.current = fetch("/documents.json")
+        .then(res => res.json())
+        .catch(err => {
 
-        const docsResponse = await fetch("/documents.json");
+          console.error("Failed to load documents.json", err);
 
-        const docs = await docsResponse.json();
+          documentsRef.current = null; // let the next send retry
 
-        setDocuments(docs);
-
-      } catch (err) {
-
-        console.error("Failed to load documents.json", err);
-      }
+          return [];
+        });
     }
 
-    loadDocuments();
+    return documentsRef.current;
 
   }, []);
+
+  // start the download as soon as the chat opens, so it is usually already
+  // finished by the time the visitor has typed a question
+  useEffect(() => {
+
+    if (open) loadDocuments();
+
+  }, [open, loadDocuments]);
 
   async function sendMessage() {
 
@@ -99,6 +107,10 @@ export default function ChatbotWidget() {
 
       // 2. retrieve top K most relevant chunks
       console.log("2. started searching");
+
+      // awaits the deferred fetch, so a question asked before the download
+      // finishes still searches a populated index instead of an empty one
+      const documents = await loadDocuments();
 
       // perform cosine similary search betweeen the embedded user query and documents
       const topChunks = searchDocuments(
@@ -208,24 +220,34 @@ export default function ChatbotWidget() {
             ],
           context, // optional
           prompt: `
+          You are Eric bot, the chatbot on Eric's portfolio site. Eric is a
+          fourth-year Computer Science Specialist at the University of Toronto.
 
-          You are a concise RAG assistant for a personal portfolio website.
+          "Eric bot" is only your name. You speak in Eric's own first-person voice:
+          "I built", "I used", "my project". Visitors already know they are talking
+          to Eric bot, so never refer to Eric in the third person, and never frame
+          yourself as something reporting on his work.
 
-          Answer ONLY using retrieved context. Do not guess or add outside knowledge.
+          You are given private reference notes below. They are your own memory of
+          your work. Use them, but never mention, quote, or allude to them.
 
-          You are Eric bot, representing Eric, a fourth-year Computer Science Specialist at University of Toronto. 
-          Answer all questions in first person, reflecting Eric's experiences, skills, and projects.
-          Use the retrieved information to answer, but always speak as Eric: "I", "my", "me", etc.
+          Never open with meta framing. Do not write things like "I summarize
+          OpenCrawl like this", "Here's a summary", "Based on my notes", or
+          "According to the information provided". Answer the question directly.
+
+          The notes are written as terse technical documentation. Say the facts in
+          your own conversational voice instead of copying their phrasing, headings,
+          or label-style fragments like "Design principle: X".
 
           Rules:
-          - Answer the user's exact question only.
-          - Ignore unrelated retrieved information.
-          - Prefer 1-3 relevant facts instead of summarizing everything.
-          - If context is insufficient, say: "Not enough information in the provided context."
-          - If the query is ambiguous, ask one short clarification question.
-          - Keep responses under 120 words.
-          - Use short paragraphs or bullets.
-          - Never mention retrieval, chunks, embeddings, or context unless asked.
+          - Answer the exact question asked, nothing more.
+          - Give 2-4 specific, concrete facts rather than summarizing everything.
+          - Never invent anything that is not in the notes.
+          - If you don't have the detail, say so plainly as yourself, e.g. "I haven't
+            written that part up yet", and offer what you can speak to instead.
+          - If the question is ambiguous, ask one short clarifying question.
+          - Under 120 words, conversational, first person.
+          - Never mention retrieval, embeddings, chunks, documents, context, or notes.
           `, // set prompt here or leave it to backend
         }),
       });
@@ -237,7 +259,10 @@ export default function ChatbotWidget() {
 
         const text = await response.text();
 
-        throw new Error(text);
+        // include the status: a 404 here means /api/chat is not being served
+        // (plain `vite dev` does not run the serverless function - use `vercel dev`),
+        // while a 500 is the handler itself failing
+        throw new Error(`/api/chat responded ${response.status}: ${text.slice(0, 300)}`);
       }
 
       const data = await response.json();
@@ -266,7 +291,8 @@ export default function ChatbotWidget() {
 
     } catch (err) {
 
-      console.error(err);
+      // the chat bubble stays generic for visitors; the real reason goes here
+      console.error("Chat request failed:", err);
 
       // set error message in chatbot if something goes wrong with the API call
       setMessages((prev) => [
