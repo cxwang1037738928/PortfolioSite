@@ -6,16 +6,16 @@ import { Room } from "./Room";
 import HeroLights from "./HeroLights";
 
 const HeroExperience = () => {
-    /* uses react-responsive to detect tablet/mobile */
-    const isTablet = useMediaQuery({ query: '(max-width: 1024px)'}); 
+    /* uses react-responsive to detect mobile */
     const isMobile = useMediaQuery({ query: '(max-width: 768px)'});
   return (
     <Canvas /* Three.js Canvas */
     camera={{ position: [0, 0, 15], fov: 45}} >
 
-        <OrbitControls /* allows user to move around 3D model */    
+        <OrbitControls /* allows user to move around 3D model */
         enablePan={false} /* disallow user from panning from the model */
-        enableZoom={!isTablet} /* disallow zoom on tablet since it prevents scrolling */
+        enableZoom={false} /* the canvas covers most of the hero, so wheel-to-zoom
+                              swallows the page scroll at every width. Drag still rotates. */
         maxDistance={20} /* maximum distance the camera can zoom out */
         minDistance={5} /* min distance user can zoom in */
         minPolarAngle={Math.PI / 5} /* Limit camera rotation in y plain, larger = smaller area of movement*/
