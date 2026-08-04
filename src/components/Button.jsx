@@ -22,7 +22,9 @@ const Button = ({ text, className, id }) => {
             <div className="bg-circle"/>
             <p className="text">{text}</p>
             <div className="arrow-wrapper">
-                <img src="/images/arrow-down.svg" alt="arrow"/>
+                {/* decorative: the button already reads "See my Work", and an empty
+                    alt means a missing file shows nothing instead of stray text */}
+                <img src="/images/arrow-down.svg" alt=""/>
             </div>
             
         </div>

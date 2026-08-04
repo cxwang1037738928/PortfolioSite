@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { lazy, Suspense } from 'react'
 import { words } from '../constants/index.js'
 import Button from '../components/Button.jsx'
-import HeroExperience from '../components/HeroModels/HeroExperience.jsx'
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import AnimatedCounter from '../components/AnimatedCounter.jsx';
+
+/* three.js and drei are ~1.16MB of the bundle. Loading them lazily lets the rest
+   of the page mount and become scrollable instead of waiting on the 3D scene. */
+const HeroExperience = lazy(() => import('../components/HeroModels/HeroExperience.jsx'));
 
 const Hero = () => {
     /* Animates the text in hero section on screen load */
@@ -68,9 +71,13 @@ const Hero = () => {
             </header>
             {/* RIGHT: 3D MODEL */}
             <figure>
-                <div className="hero-3d-layout" 
+                <div className="hero-3d-layout"
                 /* 70% width on large devices, full width on small devices */>
-                    <HeroExperience />
+                    {/* the wrapper is absolutely positioned with fixed dimensions,
+                        so the space is already reserved and nothing shifts on arrival */}
+                    <Suspense fallback={null}>
+                        <HeroExperience />
+                    </Suspense>
                 </div>
             </figure>
         </div>
