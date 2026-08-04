@@ -7,16 +7,24 @@
 
 html,
 body {
-  width: 100dvw;
-  overflow-x: hidden;
+  /* 100% measures the content box; 100dvw includes the scrollbar gutter and so
+     overflowed by its width on every element that used it */
+  width: 100%;
   background-color: black;
   color: white;
   scroll-behavior: smooth;
   font-family: "Mona Sans", sans-serif;
 }
 
+/* Only on the root: setting it on html and body both makes each one its own
+   scroll container, which is what produced two vertical scrollbars. Kept as
+   insurance against stray overflow from absolutely positioned pieces. */
+html {
+  overflow-x: hidden;
+}
+
 section {
-  width: 100dvw;
+  width: 100%;
 }
 
 @theme {
