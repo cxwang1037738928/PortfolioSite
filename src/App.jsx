@@ -10,6 +10,10 @@ import EducationSection from './sections/EducationSection.jsx'
 const App = () => {
   return (
     <main>
+        {/* Page order matches the navigation bar: Projects (#work), Skills
+            (#skills), then Education (#Education). Education is its own section
+            rather than part of Skills so that last link has a real target.
+            ChatbotWidget is last but position: fixed, so it floats over the rest. */}
         <Navbar/>
         <Hero/>
         <ShowcaseSection/>

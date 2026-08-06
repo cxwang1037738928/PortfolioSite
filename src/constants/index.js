@@ -82,7 +82,9 @@ const skillCategories = [
   { key: "tool", label: "Tools" },
 ];
 
-// what each proficiency level means, used for the legend and pill styling
+// what each proficiency level means. Drives both the legend labels and the pill
+// fill: 3 is solid, 2 muted, 1 outline. Listed strongest first so the legend
+// reads in the same order the pills inside each group are sorted.
 const skillLevels = [
   { level: 3, label: "Advanced" },
   { level: 2, label: "Proficient" },
@@ -119,7 +121,9 @@ const skills = [
   { name: "JavaFX", level: 1, category: "framework" },
 ];
 
-// Data for EducationSection.jsx
+// Data for EducationSection.jsx. An array so more entries can be added without
+// touching the component. focus and coursework are both optional; coursework is
+// rendered with the same SkillPill used by the skills grid.
 const education = [
   {
     degree: "Honours Bachelor of Science, Computer Science Specialist",

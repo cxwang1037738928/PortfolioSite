@@ -481,11 +481,16 @@ section {
 
 
 
-/* Skills + Education */
+/* Skills + Education
+   Inside @layer components like the rest of the theme, rather than as the loose
+   rules the old bubble styles used, so utility classes in a class attribute
+   still win over these. */
 @layer components {
 
   /* Shared pill, used for skills and for coursework.
-     Proficiency reads through the fill rather than the size. */
+     Proficiency reads through the fill rather than the size: solid at level 3,
+     muted at 2, outline at 1. Every pill is then the same height, so long names
+     fit and the rows line up. .is-dimmed / .is-active are the filter states. */
   .skill-pill {
     @apply inline-flex items-center rounded-full border px-4 py-1.5 text-sm md:text-base
            transition-all duration-300 hover:-translate-y-0.5;
@@ -513,11 +518,12 @@ section {
     }
   }
 
-  /* only the legend pills are buttons */
+  /* only the legend pills are buttons, the rest are spans */
   button.skill-pill {
     @apply cursor-pointer;
   }
 
+  /* wrapping row of pills, shared by the skill groups and the coursework list */
   .pill-row {
     @apply flex flex-wrap gap-3;
   }

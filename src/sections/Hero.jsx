@@ -5,8 +5,12 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import AnimatedCounter from '../components/AnimatedCounter.jsx';
 
-/* three.js and drei are ~1.16MB of the bundle. Loading them lazily lets the rest
-   of the page mount and become scrollable instead of waiting on the 3D scene. */
+/* three.js and drei are ~1.16MB of the bundle, 88% of what used to be a single
+   render-blocking chunk. Because index.html only ships an empty #root, none of
+   the page existed (and so there was no height to scroll) until all of that had
+   parsed. Importing it lazily splits it into its own chunk: the sections mount
+   at full height straight away and the 3D room streams in behind them.
+   Blocking JS went from 1320KB to 342KB. */
 const HeroExperience = lazy(() => import('../components/HeroModels/HeroExperience.jsx'));
 
 const Hero = () => {

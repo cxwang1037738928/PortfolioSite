@@ -8,7 +8,11 @@ import RotatingImage from "../components/RotatingImage";
 gsap.registerPlugin(ScrollTrigger);
 
 /* Screenshots each project card cycles through, in display order.
-   Add new files to public/images and append them here. */
+   Add new files to public/images and append them here.
+
+   Declared at module level on purpose: RotatingImage lists `images` as an effect
+   dependency, so an array built inside the component would be a new reference on
+   every render and would restart the rotation timer each time. */
 const OPENCRAWL_IMAGES = [
     "/images/OpenCrawl.png",
     "/images/OpenCrawl_2.png",
@@ -17,10 +21,13 @@ const OPENCRAWL_IMAGES = [
     "/images/OpenCrawl_5.png",
 ];
 
+/* only one screenshot so far, so this card stays static until more are added */
 const CANADA_MAPPED_IMAGES = [
     "/images/Canada_Mapped.png",
 ];
 
+/* starts from Labrador_fixed.png, not Labrador.jpg: those two are the same login
+   screen and would show as a duplicate slide */
 const LABRADOR_IMAGES = [
     "/images/Labrador_fixed.png",
     "/images/Labrador_2.jpg",
@@ -71,6 +78,9 @@ const ShowcaseSection = () => {
                         href="https://opencrawl-demo.onrender.com/"
                         target="_blank"
                         rel="noopener noreferrer"
+                        /* block + relative + full size so the stacked, absolutely
+                           positioned images inside have something to size against,
+                           while still respecting the wrapper's padding */
                         className="block relative w-full h-full"
                         >
                             <RotatingImage
@@ -106,6 +116,8 @@ const ShowcaseSection = () => {
                             href="https://canadamapped.ca"
                             target="_blank"
                             rel="noopener noreferrer"
+                            /* positioning context for the stacked images, see the
+                               featured card above */
                             className="block relative w-full h-full"
                             >
                                 <RotatingImage
@@ -131,6 +143,8 @@ const ShowcaseSection = () => {
                             href="https://github.com/cxwang1037738928/Labrador"
                             target="_blank"
                             rel="noopener noreferrer"
+                            /* positioning context for the stacked images, see the
+                               featured card above */
                             className="block relative w-full h-full"
                             >
                                 <RotatingImage

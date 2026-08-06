@@ -9,7 +9,19 @@ import { skills, skillCategories, skillLevels } from "../constants";
 
 gsap.registerPlugin(ScrollTrigger);
 
+/*
+  Skills grouped into labelled rows of pills. Proficiency is carried by the pill
+  fill rather than by size, which was the problem with the old bubbles: a 60px
+  circle could not hold a name like "Jupyter Notebook", and size is hard to
+  compare across a gap. Because the categories are now visible as rows, the old
+  category filter buttons were dropped; the proficiency legend is the only
+  control, and it highlights in place rather than reordering so the grouping
+  never moves under the reader.
+  Skills, category labels and level labels all come from constants/index.js.
+*/
 const SkillsSection = () => {
+
+    /* one ref per category row so each can be revealed on scroll independently */
     const groupRefs = useRef([]);
 
     // null = nothing selected, everything shown at full strength
@@ -53,6 +65,8 @@ const SkillsSection = () => {
                 </div>
 
                 <div className="skill-groups">
+                    {/* driven by skillCategories rather than by the skills themselves so
+                        the row order is fixed and does not depend on data ordering */}
                     {skillCategories.map(({ key, label }, index) => {
 
                         // strongest skills first so each row leads with the solid pills
@@ -60,6 +74,7 @@ const SkillsSection = () => {
                             .filter(skill => skill.category === key)
                             .sort((a, b) => b.level - a.level);
 
+                        // a category with no skills yet renders nothing at all
                         if (group.length === 0) return null;
 
                         // fade the heading too when nothing in the group matches the filter
